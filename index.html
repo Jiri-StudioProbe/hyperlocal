@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Hyperlocal Source Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Experiment · live from your browser</div>
+    <h1>Hyperlocal Source Explorer</h1>
+    <p class="lede">Tap Load on any source to call it from this device and see what it says in plain language. A source that fails here would also fail in a real app, so this is the honest test.</p>
+  </header>
+
+  <section class="loc" aria-labelledby="lh">
+    <h2 id="lh">Where am I?</h2>
+    <button class="btn primary wide" id="geo" type="button">Use my location</button>
+    <p class="msg" id="geomsg"></p>
+    <div class="fields">
+      <label>Place name<input id="f-place" autocomplete="off"></label>
+      <label>Outward postcode (UK)<input id="f-pc" autocomplete="off" placeholder="SL4"></label>
+      <label>Latitude<input id="f-lat" inputmode="decimal" autocomplete="off"></label>
+      <label>Longitude<input id="f-lon" inputmode="decimal" autocomplete="off"></label>
+    </div>
+    <div class="presets" id="presets" role="group" aria-label="Preset places"></div>
+    <p class="msg">Your location stays in this browser. It is sent only to the data provider behind a source you tap.</p>
+  </section>
+
+  <div class="bar">
+    <div class="row">
+      <button class="btn primary" id="all" type="button">Load all</button>
+      <input type="search" id="q" placeholder="Search sources" aria-label="Search sources">
+    </div>
+    <div class="row sub"><span id="sum" class="sum">Nothing loaded yet</span><button class="btn small" id="copy" type="button">Copy report</button></div>
+    <div class="cats" id="cats" role="group" aria-label="Category"></div>
+  </div>
+  <div class="reportbox"><p class="msg" id="copymsg"></p><textarea id="report" hidden readonly rows="8" aria-label="Report"></textarea></div>
+
+  <main id="list"></main>
+
+  <details class="nt">
+    <summary>Sources that cannot be tested from a browser</summary>
+    <p class="msg">These need an API key, a login or a server-side proxy, or have no known endpoint yet.</p>
+    <ul id="nt"></ul>
+  </details>
+
+  <footer>Data belongs to the providers named on each card. Several require attribution and have non-commercial terms. Last catalogue check: November 2026.</footer>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
