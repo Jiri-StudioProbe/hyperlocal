@@ -14,7 +14,7 @@
   <header>
     <div class="eyebrow">Experiment · live from your browser</div>
     <h1>Hyperlocal Source Explorer</h1>
-    <p class="lede">Tap Load on any source to call it from this device and see what it says in plain language. A source that fails here would also fail in a real app, so this is the honest test.</p>
+    <p class="lede">Every source is called live from this device as you scroll, and shown in plain language with what the numbers mean. A source that fails here would also fail in a real app, so this is the honest test.</p>
   </header>
 
   <section class="loc" aria-labelledby="lh">
@@ -33,10 +33,10 @@
 
   <div class="bar">
     <div class="row">
-      <button class="btn primary" id="all" type="button">Load all</button>
+      <button class="btn primary" id="all" type="button">Refresh all</button>
       <input type="search" id="q" placeholder="Search sources" aria-label="Search sources">
     </div>
-    <div class="row sub"><span id="sum" class="sum">Nothing loaded yet</span><button class="btn small" id="copy" type="button">Copy report</button></div>
+    <div class="row sub"><span id="sum" class="sum">Loading…</span><label class="chk"><input type="checkbox" id="hidefail"> Hide failed</label><button class="btn small" id="copy" type="button">Copy report</button></div>
     <div class="cats" id="cats" role="group" aria-label="Category"></div>
   </div>
   <div class="reportbox"><p class="msg" id="copymsg"></p><textarea id="report" hidden readonly rows="8" aria-label="Report"></textarea></div>

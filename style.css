@@ -77,3 +77,25 @@ details.raw pre{margin:6px 0 0;padding:8px;background:var(--surface2);border-rad
 footer{margin-top:26px;color:var(--muted);font-size:12px}
 @media (min-width:640px){.fields{grid-template-columns:repeat(4,minmax(0,1fr))}.btn.wide{width:auto}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+
+/* context: what the numbers mean */
+:root{--good:var(--ok);--good-bg:var(--ok-bg);--okk:var(--accent);--okk-bg:var(--surface2);--info:var(--muted);--info-bg:var(--surface2)}
+.lvl{margin:10px 0 0;padding:9px 11px;border-radius:8px;font-size:13px;line-height:1.4;background:var(--surface2);color:var(--ink);border-left:4px solid var(--muted)}
+.lvl b{font:600 13px var(--display);margin-right:6px}
+.lvl-good{background:var(--ok-bg);border-left-color:var(--ok)}.lvl-good b{color:var(--ok)}
+.lvl-ok{border-left-color:var(--accent)}.lvl-ok b{color:var(--accent)}
+.lvl-warn{background:var(--warn-bg);border-left-color:var(--warn)}.lvl-warn b{color:var(--warn)}
+.lvl-bad{background:var(--bad-bg);border-left-color:var(--bad)}.lvl-bad b{color:var(--bad)}
+.lvl-info{border-left-color:var(--muted)}
+.kv dd small.note{display:block;margin-top:2px;font:400 12px/1.35 var(--body);color:var(--muted)}
+.kv dd small.n-good{color:var(--ok)}.kv dd small.n-warn{color:var(--warn)}.kv dd small.n-bad{color:var(--bad)}
+.skel{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.skel i{display:block;height:14px;border-radius:6px;background:linear-gradient(90deg,var(--surface2),var(--line),var(--surface2));background-size:200% 100%;animation:sh 1.2s linear infinite}
+.skel i:nth-child(2){width:80%}.skel i:nth-child(3){width:60%}
+@keyframes sh{to{background-position:-200% 0}}
+@media (prefers-reduced-motion:reduce){.skel i{animation:none}}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:12px;color:var(--muted);min-height:32px;white-space:nowrap}
+.row.sub{gap:10px}.row.sub .sum{flex:1;min-width:0}
+.hidefail .card.failed{display:none}
+.st.ok{margin-top:10px;background:transparent;color:var(--muted);padding:0;font-weight:400;font-size:12px}
+.acts{margin-top:10px}
