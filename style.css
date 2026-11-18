@@ -147,3 +147,7 @@ svg.radar{max-width:340px;margin:0 auto}
 .gal img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--line)}
 .gal figcaption{padding:6px 8px;font-size:11px;line-height:1.35;overflow-wrap:anywhere}
 .gal small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+
+.fields select{height:40px;padding:0 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface2);width:100%;min-width:0;font:14px var(--body);color:var(--ink)}
+.msg.note{padding:8px 10px;border-radius:8px;background:var(--surface2);border-left:4px solid var(--accent);font-size:12px;line-height:1.45;color:var(--ink)}
+.loc .chk{margin-top:6px}

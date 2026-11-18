@@ -54,8 +54,8 @@ add('weather','wttr','wttr.in','Global','open','hourly','m','scrap','A friendly 
   u:function(c){return 'https://wttr.in/'+c.lat+','+c.lon+'?format=j1'},docs:'https://github.com/chubin/wttr.in',note:'A hobby service wrapping other data. Little reason to prefer it over Open-Meteo.'});
 
 /* air */
-add('air','om-aq','Open-Meteo air quality and pollen','Global','open','hourly','r','keep','Modelled PM, NO₂, ozone, UV index, European AQI and six pollen types.',{
-  u:function(c){return 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+c.lat+'&longitude='+c.lon+'&current=european_aqi,pm2_5,pm10,nitrogen_dioxide,ozone,uv_index&hourly=alder_pollen,birch_pollen,grass_pollen&forecast_days=1&timezone=auto'},
+add('air','om-aq','Open-Meteo air quality and pollen','Global','open','hourly','r','keep','Modelled PM, NO₂, ozone, desert dust, UV index, European AQI and pollen types.',{
+  u:function(c){return 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude='+c.lat+'&longitude='+c.lon+'&current=european_aqi,pm2_5,pm10,nitrogen_dioxide,ozone,uv_index,dust&hourly=alder_pollen,birch_pollen,grass_pollen&forecast_days=1&timezone=auto'},
   docs:'https://open-meteo.com/en/docs/air-quality-api',note:'About 11 km grid over Europe, so this is a model, not a measurement. Pollen is European and in season only.'});
 add('air','sensorcomm','Sensor.Community','Global','open','live','r','keep','Citizen air sensors: PM2.5, PM10, temperature, humidity and noise, at exact coordinates.',{
   u:function(c){return 'https://data.sensor.community/airrohr/v1/filter/area='+c.lat+','+c.lon+',15'},
@@ -206,7 +206,7 @@ add('news','gdelt-doc','GDELT document search','Global','open','live','r','keep'
 add('news','gdelt-geo','GDELT geographic search','Global','open','live','r','maybe','The same news, grouped by location mentions.',{
   u:function(c){return 'https://api.gdeltproject.org/api/v2/geo/geo?query='+enc(c.place)+'&format=geojson&timespan=24h'},docs:'https://blog.gdeltproject.org/gdelt-geo-2-0-api-debuts/',note:'One client library warns this API may be deprecated. A 404 would confirm it.'});
 add('news','gnews','Google News search feed','Global','open','live','m','maybe','News search results for a place name, as RSS.',{
-  u:function(c){return 'https://news.google.com/rss/search?q='+enc(c.place+' when:1d')+'&hl=en-GB&gl=GB&ceid=GB:en'},docs:'https://news.google.com/',note:'Unofficial, in a grey area on terms, and has no CORS headers. Headlines and links only.'});
+  u:function(c){return 'https://news.google.com/rss/search?q='+enc(c.place+' when:1d')+'&'+({GB:'hl=en-GB&gl=GB&ceid=GB:en',NL:'hl=nl&gl=NL&ceid=NL:nl',FR:'hl=fr&gl=FR&ceid=FR:fr',IL:'hl=en-IL&gl=IL&ceid=IL:en',US:'hl=en-US&gl=US&ceid=US:en'}[String(c.cc||'').toUpperCase()]||'hl=en&gl=US&ceid=US:en')},docs:'https://news.google.com/',note:'Unofficial, in a grey area on terms, and has no CORS headers. Headlines and links only.'});
 add('news','bbc-berks','BBC News: Berkshire','UK','open','live','m','keep','Regional BBC feed covering Windsor.',{
   u:function(){return 'https://feeds.bbci.co.uk/news/england/berkshire/rss.xml'},docs:'https://www.bbc.co.uk/news/10628494',note:'RSS. Headlines and links only.'});
 add('news','bbc-surrey','BBC News: Surrey','UK','open','live','m','keep','Regional BBC feed for Surrey.',{
@@ -251,7 +251,7 @@ add('hazard','eonet','NASA EONET open events','Global','open','daily','m','scrap
   u:function(){return 'https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=10'},docs:'https://eonet.gsfc.nasa.gov/docs/v3',note:'Global scale.'});
 add('hazard','firms','NASA FIRMS active fires','Global','key','hourly','m','scrap','Satellite fire detections.',{docs:'https://firms.modaps.eosdis.nasa.gov/api',note:'Free map key. Rare in Surrey.'});
 add('hazard','meteoalarm','Meteoalarm (Europe)','Europe','open','live','m','maybe','National weather warnings across Europe as Atom feeds.',{
-  u:function(){return 'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-united-kingdom'},docs:'https://meteoalarm.org',note:'Feed path from memory. Overlaps Met Office warnings.'});
+  u:function(c){var m={GB:'united-kingdom',NL:'netherlands',FR:'france',IL:'israel',DE:'germany',BE:'belgium',ES:'spain',IT:'italy',IE:'ireland',AT:'austria',CH:'switzerland',PL:'poland',PT:'portugal',SE:'sweden',NO:'norway',DK:'denmark',FI:'finland',GR:'greece',CZ:'czechia',HU:'hungary',RO:'romania'}[String(c.cc||'').toUpperCase()];return m?'https://feeds.meteoalarm.org/feeds/meteoalarm-legacy-atom-'+m:null},docs:'https://meteoalarm.org',note:'The feed lists every warning for the country, not just your area. Overlaps national weather services.'});
 
 /* sky */
 add('sky','suncalc','Sun and moon, computed locally','Global','open','static','m','keep','Sunrise, sunset, golden hour and moon phase with no network call.',{
@@ -278,8 +278,33 @@ add('nature','gbif','GBIF occurrences','Global','open','monthly','m','scrap','Ar
 add('context','bankhol','GOV.UK bank holidays','UK','open','static','m','keep','Bank holidays for England and Wales, Scotland and Northern Ireland.',{
   u:function(){return 'https://www.gov.uk/bank-holidays.json'},docs:'https://www.gov.uk/bank-holidays',note:'No key.'});
 add('context','nager','Nager.Date public holidays','Global','open','static','m','maybe','Upcoming public holidays for 100+ countries.',{
-  u:function(){return 'https://date.nager.at/api/v3/NextPublicHolidays/GB'},docs:'https://date.nager.at',note:'No key.'});
+  u:function(c){return 'https://date.nager.at/api/v3/NextPublicHolidays/'+enc(String(c.cc||'GB').toUpperCase())},docs:'https://date.nager.at',note:'No key.'});
 
+
+/* ---------- country packs ---------- */
+var OM='https://api.open-meteo.com/v1/forecast?latitude=';
+add('weather','om-knmi','Open-Meteo on the KNMI model','NL','open','hourly','r','keep','The same API pinned to the Dutch weather service model.',{modelLabel:'KNMI model',u:function(c){return OM+c.lat+'&longitude='+c.lon+'&models=knmi_seamless&current=temperature_2m,precipitation,wind_speed_10m,weather_code&hourly=temperature_2m,precipitation&forecast_hours=6&timezone=auto'},docs:'https://open-meteo.com/en/docs/knmi-api',note:'Compare with the global call and with Buienradar.'});
+add('weather','om-arome','Open-Meteo on the Météo-France model','FR','open','hourly','r','keep','The same API pinned to the French AROME high-resolution model.',{modelLabel:'Météo-France AROME model',u:function(c){return OM+c.lat+'&longitude='+c.lon+'&models=meteofrance_seamless&current=temperature_2m,precipitation,wind_speed_10m,weather_code&hourly=temperature_2m,precipitation&forecast_hours=6&timezone=auto'},docs:'https://open-meteo.com/en/docs/meteofrance-api',note:'Compare with the global call.'});
+add('weather','nl-buienradar','Buienradar national feed','NL','open','live','r','keep','Live observations from 40 stations plus the five-day outlook; the nearest station is picked for you.',{u:function(){return 'https://data.buienradar.nl/2.0/feed/json'},docs:'https://www.buienradar.nl/overbuienradar/gratis-weerdata',note:'Free with credit to Buienradar. Forecaster text is in Dutch.'});
+add('air','nl-luchtmeetnet','Luchtmeetnet (RIVM) air quality','NL','open','hourly','r','keep','Modelled PM2.5, PM10 and nitrogen dioxide for any Dutch coordinates, past and coming hours.',{u:function(c){return 'https://api.luchtmeetnet.nl/open_api/concentrations?formula=pm25&latitude='+c.lat+'&longitude='+c.lon},run:'nl-luchtmeetnet',docs:'https://api-docs.luchtmeetnet.nl',note:'Free, fair use, about 100 requests per 5 minutes.'});
+add('places','nl-pdok','PDOK address lookup','NL','open','static','r','maybe','Coordinates to address, municipality, province and neighbourhood.',{u:function(c){return 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/reverse?lat='+c.lat+'&lon='+c.lon+'&rows=1&type=adres&fl='+enc('weergavenaam,gemeentenaam,provincienaam,woonplaatsnaam,wijknaam,buurtnaam')},docs:'https://api.pdok.nl',note:'The Dutch equivalent of postcodes.io.'});
+add('news','nl-nos','NOS Nieuws','NL','open','live','m','maybe','National headlines from the Dutch public broadcaster.',{u:function(){return 'https://feeds.nos.nl/nosnieuwsalgemeen'},docs:'https://nos.nl/over-de-nos/rss',note:'In Dutch. No CORS header was seen, so a browser may block it.',hint:'No CORS header was seen, so the browser will probably block this.'});
+add('transport','nl-ovapi','OVapi public transport (GTFS-RT)','NL','open','live','m','maybe','Keyless real-time positions for Dutch buses, trams and trains.',{docs:'https://gtfs.ovapi.nl',note:'Protobuf, so it needs decoding on a server.'});
+add('transport','nl-ns','NS train API','NL','key','live','m','maybe','Departures, disruptions and journeys for Dutch rail.',{docs:'https://apiportal.ns.nl',note:'Free key.'});
+add('weather','nl-knmi','KNMI Data Platform','NL','key','hourly','r','maybe','Official observations, radar and model data.',{docs:'https://developer.dataplatform.knmi.nl',note:'Needs an API key.'});
+add('energy','fr-eco2mix','RTE eCO2mix (French grid)','FR','open','live','r','keep','National carbon intensity, demand and generation mix at 15-minute steps.',{u:function(){return 'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/eco2mix-national-tr/records?limit=48&select='+enc('date_heure,taux_co2,consommation,eolien,solaire,nucleaire,gaz,hydraulique,bioenergies,charbon,fioul')+'&where='+enc('taux_co2 is not null')+'&order_by='+enc('date_heure desc')},docs:'https://www.rte-france.com/en/eco2mix',note:'The French counterpart of the UK Carbon Intensity API, but one national figure.'});
+add('transport','fr-fuel','French fuel prices','FR','open','live','r','keep','Prices at every station within 3 km, reported by the stations themselves.',{u:function(c){return 'https://data.economie.gouv.fr/api/explore/v2.1/catalog/datasets/prix-des-carburants-en-france-flux-instantane-v2/records?limit=20&where='+enc("within_distance(geom, geom'POINT("+c.lon+" "+c.lat+")', 3km)")},docs:'https://www.prix-carburants.gouv.fr/rubrique/opendata/',note:'The French counterpart of UK Fuel Finder, but with no login.'});
+add('places','fr-adresse','Base Adresse Nationale','FR','open','static','r','maybe','Coordinates to the nearest address, commune, postcode and department.',{u:function(c){return 'https://api-adresse.data.gouv.fr/reverse/?lon='+c.lon+'&lat='+c.lat},docs:'https://adresse.data.gouv.fr/api-doc/adresse',note:'The French equivalent of postcodes.io.'});
+add('water','fr-hubeau','Hub’Eau river levels','FR','open','live','m','maybe','Real-time river height and flow from French gauges within 40 km.',{u:function(c){return 'https://hubeau.eaufrance.fr/api/v1/hydrometrie/observations_tr?latitude='+c.lat+'&longitude='+c.lon+'&distance=40&size=10&grandeur_hydro=H&sort=desc'},docs:'https://hubeau.eaufrance.fr/page/api-hydrometrie',hint:'Returned the Hub’Eau website, not data, from my test server. Your phone may do better.',note:'Etalab open licence.'});
+add('transport','fr-velib','Vélib’ bike availability','FR','open','live','m','maybe','Bikes and free docks at the nearest Paris stations.',{u:function(){return 'https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/station_status.json'},run:'fr-velib',docs:'https://www.velib-metropole.fr/donnees-open-data-gbfs-du-service-velib-metropole',hint:'The host dropped connections from my test server. Your phone may do better.',note:'Paris only. GBFS standard.'});
+add('transport','fr-prim','Île-de-France Mobilités PRIM','FR','key','live','m','maybe','Real-time public transport for Paris and the surrounding region.',{docs:'https://prim.iledefrance-mobilites.fr',note:'Free key.'});
+add('transport','fr-sncf','SNCF API','FR','key','live','m','maybe','Train timetables and disruptions.',{docs:'https://www.digital.sncf.com/startup/api',note:'Needs a key.'});
+add('weather','fr-meteofrance','Météo-France API','FR','key','hourly','m','maybe','Official observations, warnings (vigilance) and models.',{docs:'https://portail-api.meteofrance.fr',note:'Free key.'});
+add('air','fr-atmo','Atmo France','FR','key','hourly','m','maybe','Regional air-quality index and forecasts.',{docs:'https://admindata.atmo-france.org',note:'Needs a key.'});
+add('places','il-datagov','data.gov.il (national open data)','IL','open','daily','r','maybe','A catalogue of Israeli government datasets, searchable by keyword.',{u:function(){return 'https://data.gov.il/api/3/action/package_search?q=air&rows=3'},docs:'https://data.gov.il/dataset',note:'A catalogue, not a live local feed. Shown to test the portal. Open CORS headers seen.'});
+add('weather','il-ims','Israel Meteorological Service','IL','key','hourly','m','maybe','Official forecasts and observations.',{docs:'https://ims.gov.il/en',note:'Data access needs a token requested from IMS.'});
+add('hazard','il-alerts','Emergency and rocket alerts','IL','closed','live','m','scrap','Official civil-defence alerts.',{note:'Use the official Home Front Command app. There is no open browser feed I would trust for this, and unofficial copies can be wrong or late.'});
+add('transport','il-mot','Israel public transport (Ministry of Transport)','IL','key','live','m','maybe','Real-time bus positions and timetables.',{docs:'https://www.gov.il/en/departments/topics/open-data-in-transportation',note:'Real-time needs registration; the timetable files are large downloads.'});
 
 /* ---------- helpers ---------- */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
@@ -302,9 +327,9 @@ var WMO={0:'Clear',1:'Mainly clear',2:'Partly cloudy',3:'Overcast',45:'Fog',48:'
 var R={};
 function lat0(c){return parseFloat(c.lat)} function lon0(c){return parseFloat(c.lon)}
 
-R['om-ukmo']=function(t){var d=J(t);if(d.error)fail(d.reason);var c=d.current,h=d.hourly;
+R['om-ukmo']=function(t,c0,s0){var d=J(t);if(d.error)fail(d.reason);var c=d.current,h=d.hourly;
   var items=h?h.time.slice(0,6).map(function(x,i){return {t:x.slice(11),x:r1(h.temperature_2m[i])+' °C, '+h.precipitation[i]+' mm rain'}}):[];
-  return {headline:r1(c.temperature_2m)+' °C, '+(WMO[c.weather_code]||'code '+c.weather_code).toLowerCase()+' (Met Office model)',rows:[['Wind',r1(c.wind_speed_10m)+' km/h'],['Rain now',c.precipitation+' mm'],['Model time',clock(c.time)]],items:items,itemsTitle:'Next hours'}};
+  return {headline:r1(c.temperature_2m)+' °C, '+(WMO[c.weather_code]||'code '+c.weather_code).toLowerCase()+' ('+((s0&&s0.modelLabel)||'Met Office model')+')',rows:[['Wind',r1(c.wind_speed_10m)+' km/h'],['Rain now',c.precipitation+' mm'],['Model time',clock(c.time)]],items:items,itemsTitle:'Next hours'}};
 R['om-flood']=function(t){var d=J(t);if(d.error)fail(d.reason);var q=d.daily;return {headline:'River discharge '+r1(q.river_discharge[0])+' m³/s today',rows:[['Grid cell',d.latitude.toFixed(3)+', '+d.longitude.toFixed(3)]],items:q.time.map(function(x,i){return {t:x.slice(5),x:r1(q.river_discharge[i])+' m³/s'}}),itemsTitle:'Forecast'}};
 R['om-marine']=function(t){var d=J(t);if(d.error)fail(d.reason);var c=d.current;if(c.wave_height==null)fail('No wave data here. This point is inland.');return {headline:'Waves '+c.wave_height+' m, period '+c.wave_period+' s',rows:[['Sea temperature',c.sea_surface_temperature+' °C']]}};
 R['om-geo']=function(t){var d=J(t);var r=d.results||[];return {headline:r.length?r[0].name+', '+(r[0].admin1||'')+', '+r[0].country:'No match',items:r.map(function(x){return {t:x.country_code,x:x.name+(x.admin1?', '+x.admin1:'')+' ('+x.latitude.toFixed(2)+', '+x.longitude.toFixed(2)+')'}}),itemsTitle:'Matches'}};
@@ -325,8 +350,6 @@ R['tfl-status']=function(t){var d=J(t),bad=d.filter(function(l){return l.lineSta
 R['tfl-stops']=function(t){var d=J(t),s=d.stopPoints||[];return s.length?{headline:s.length+' stops within 500 m',items:s.slice(0,6).map(function(x){return {t:x.distance?Math.round(x.distance)+' m':'',x:x.commonName}})}:{headline:'No TfL stops within 500 m',flag:'Outside Greater London, so TfL has nothing here.'}};
 R['tfl-road']=function(t){var d=J(t);return {headline:d.length+' live disruptions on London roads',items:d.slice(0,5).map(function(x){return {t:x.severity,x:trunc(strip(x.location||x.comments),110)}}),flag:'London only.'}};
 R['tfl-bike']=function(t){var d=J(t),p={};(d.additionalProperties||[]).forEach(function(x){p[x.key]=x.value});return {headline:d.commonName+': '+p.NbBikes+' bikes, '+p.NbEmptyDocks+' empty docks',rows:[['Updated',clock(p.NbBikes&&d.additionalProperties[0].modified)]],flag:'London only; a single dock sample.'}};
-R['gbfs']=function(t){var rows=t.trim().split('\n'),h=rows[0].split(',');var gb=rows.slice(1).filter(function(r){return r.indexOf('GB,')===0});
-  return {headline:(rows.length-1)+' bike and scooter systems worldwide, '+gb.length+' in the UK',items:gb.slice(0,8).map(function(r){var p=r.split(',');return {t:p[0],x:(p[1]||'')+' ('+(p[2]||'')+')'}}),itemsTitle:'UK systems'}};
 R['mobdb']=function(t){var rows=t.split('\n'),h=rows[0].split(',');return {headline:(rows.length-1)+' public transport feeds in the catalogue',rows:[['Columns',h.length],['Size',r1(t.length/1048576)+' MB']],flag:'Large file. Fetch once and cache.'}};
 R['digitraffic']=function(t){var d=J(t),f=d.features||[];return {headline:f.length+' Finnish traffic announcements',items:f.slice(0,5).map(function(x){var a=(x.properties.announcements||[])[0]||{};return {t:'',x:trunc(a.title||x.properties.situationType,110)}})}};
 R['opensky']=function(t,c){var d=J(t),s=d.states||[];var air=s.filter(function(x){return !x[8]});
@@ -352,11 +375,10 @@ R['bsky-app']=R['bsky-pub']=function(t){var d=J(t),p=d.posts||[];return {headlin
 R['usgs-eq']=function(t){var f=J(t).features;return f.length?{headline:f.length+' recent earthquakes within 1,000 km',items:f.map(function(x){return {t:clock(x.properties.time),x:'M'+x.properties.mag+' · '+x.properties.place}})}:{headline:'No earthquakes within 1,000 km',flag:'Normal for southern England.'}};
 R['gdacs']=function(t){var f=J(t).features||[];return {headline:f.length+' global disaster alerts',items:f.slice(0,6).map(function(x){var p=x.properties;return {t:p.alertlevel,x:trunc(p.name||p.eventtype,100)}}),flag:'Global scale, rarely local.'}};
 R['eonet']=function(t){var e=J(t).events||[];return {headline:e.length+' open natural events worldwide',items:e.slice(0,6).map(function(x){return {t:x.categories[0].title,x:trunc(x.title,90)}})}};
-R['meteoalarm']=function(t){var e=atom(t);return {headline:e.length+' UK warning entries in the feed',items:e.slice(0,6).map(function(x){return {t:clock(x.date),x:trunc(x.title,100)}}),flag:'No CORS header expected, so a browser may block it.'}};
+R['meteoalarm']=function(t,c){var e=atom(t);return {headline:e.length+' warning entries for '+(CCNAME[String((c&&c.cc)||'').toUpperCase()]||'this country')+' in the feed',items:e.slice(0,6).map(function(x){return {t:clock(x.date),x:trunc(x.title,100)}}),flag:'No CORS header expected, so a browser may block it.'}};
 R['swpc-oval']=function(t){var d=J(t);return {headline:'Aurora forecast grid, '+(d.coordinates||[]).length+' points',rows:[['Observation time',d['Observation Time']],['Forecast time',d['Forecast Time']]],flag:'Large file; needs processing to be useful.'}};
 R['iss']=function(t){var d=J(t);return {headline:'ISS over '+r1(d.latitude,1)+', '+r1(d.longitude,1),rows:[['Altitude',r1(d.altitude,0)+' km'],['Speed',r1(d.velocity,0)+' km/h'],['Visibility',d.visibility],['Updated',ago(d.timestamp)]]}};
 R['gbif']=function(t){var d=J(t);return {headline:d.count+' archived species records nearby',items:d.results.slice(0,6).map(function(o){return {t:(o.eventDate||'').slice(0,10),x:o.species||o.scientificName}})}};
-R['nager']=function(t){var d=J(t);return {headline:'Next: '+d[0].localName+', '+d[0].date,items:d.slice(0,4).map(function(x){return {t:x.date,x:x.localName}})}};
 R['ukair-sos']=function(t){var d=J(t);return {headline:'Returned '+d.length+' stations from the national list',items:d.slice(0,5).map(function(x){return {t:'',x:x.properties.label}}),flag:'No distance filter in this call; you would filter by location yourself.'}};
 R['usgs-water']=function(t){var d=J(t),s=(d.value&&d.value.timeSeries)||[];return {headline:s.length+' US river gauges in the box',items:s.slice(0,5).map(function(x){return {t:'',x:x.sourceInfo.siteName}}),flag:'US only.'}};
 R['overpass']=function(t){var d=J(t),e=d.elements||[];return {headline:e.length+' mapped places within 400 m',items:e.slice(0,10).map(function(x){var g=x.tags||{};return {t:g.amenity||'',x:g.name||'(unnamed)'+(g.opening_hours?' · '+g.opening_hours:'')}}),itemsTitle:'Nearby amenities'}};
@@ -412,6 +434,7 @@ RUN['om-forecast']=function(c,get,first){var pv=R['om-forecast'](first.text,c);
     pv.headline+=' · '+word+' for the season';return pv},function(){return pv})};
 R['om-aq']=function(t){var d=J(t);if(d.error)fail(d.reason);var c=d.current,i=aqiIdx(c.european_aqi),rows=[];
   ['pm2_5','pm10','nitrogen_dioxide','ozone'].forEach(function(p){if(c[p]!=null)rows.push(pollRow(p,c[p]))});
+  if(c.dust!=null){var du=c.dust>=100?['Dust storm levels.','bad']:c.dust>=50?['Elevated desert dust.','warn']:c.dust>=20?['Some dust in the air.','ok']:['Little dust.','good'];rows.push(['Desert dust',c.dust+' µg/m³',du[0],du[1]])}
   if(c.uv_index!=null){var u=uvInfo(c.uv_index);rows.push(['UV index',c.uv_index,u[0]+'. '+u[1],u[2]])}
   var h=d.hourly;if(h)[['alder_pollen','Alder pollen'],['birch_pollen','Birch pollen'],['grass_pollen','Grass pollen']].forEach(function(k){var v=(h[k[0]]||[]).filter(function(x){return x!=null}),m=v.length?Math.max.apply(null,v):null,p=pollenInfo(m);rows.push([k[1],m==null?'no data':m+' grains/m³',p[0]+'. '+p[1],p[2]])});
   return {headline:'Air quality: '+BAND_WORDS[i].toLowerCase(),level:{k:lk(i),label:BAND_WORDS[i],text:AQI_TEXT[i]},rows:rows,flag:'A model on an 11 km grid, not a measurement at your street. Bands follow the European Air Quality Index; percentages are against the WHO guideline.'}};
@@ -502,6 +525,64 @@ R['fsa']=function(t){var d=J(t),e=d.establishments||[],n=function(s){return Stri
 R['police']=function(t){var d=J(t),by={};d.forEach(function(c){by[c.category]=(by[c.category]||0)+1});var m=d[0]&&d[0].month,keys=Object.keys(by).sort(function(a,b){return by[b]-by[a]}),days=30;
   return {headline:d.length+' crimes reported within a mile in '+m,level:{k:'info',label:'About '+r1(d.length/days,1)+' a day',text:'The most common type was '+(keys[0]||'none').replace(/-/g,' ')+' ('+(by[keys[0]]||0)+'). This is a count, not a rate, so compare it with another area before reading anything into it.'},rows:[['Month covered',m],['Freshness','About 2 months behind']],items:keys.slice(0,6).map(function(k){return {t:by[k],x:k.replace(/-/g,' ')}}),itemsTitle:'By category',flag:'Monthly data with locations deliberately blurred. Not live.'}};
 
+
+/* ---------- country packs: Netherlands, France, Israel ---------- */
+var CCNAME={GB:'the UK',NL:'the Netherlands',FR:'France',IL:'Israel',US:'the United States',DE:'Germany',FI:'Finland',NO:'Norway'};
+var NL_WX={zonnig:'sunny',helder:'clear','half bewolkt':'partly cloudy',bewolkt:'cloudy','zwaar bewolkt':'overcast','licht bewolkt':'mostly clear',regen:'rain','lichte regen':'light rain',buien:'showers',mist:'mist',mistig:'misty','vrijwel onbewolkt':'almost clear','geheel bewolkt':'overcast',onweer:'thunder',sneeuw:'snow',hagel:'hail','zwaar bewolkt en regen':'overcast with rain'};
+function nlWx(s){var k=String(s||'').toLowerCase();return NL_WX[k]||k}
+R['nl-buienradar']=function(t,c){var d=J(t),st=((d.actual||{}).stationmeasurements||[]).filter(function(s){return s.lat!=null&&s.temperature!=null}).map(function(s){s._km=hav(lat0(c),lon0(c),s.lat,s.lon);return s}).sort(function(a,b){return a._km-b._km}),s=st[0];if(!s)fail('No station data in the feed');
+  var f=d.forecast||{},days=f.fivedayforecast||[],ws=s.windspeed!=null?s.windspeed*3.6:null,r24=s.rainFallLast24Hour,name=String(s.regio||s.stationname||'').replace(/^Meetstation /,'');
+  var rows=[['Station',name+', '+r1(s._km,0)+' km away'],['Feels like',s.feeltemperature+' °C'],['Wind',ws!=null?r1(ws,0)+' km/h '+(s.winddirection||''):'n/a',ws!=null?beaufort(ws)+(s.windgusts?', gusts to '+r1(s.windgusts*3.6,0)+' km/h':''):undefined],['Humidity',s.humidity+' %'],
+    ['Rain in the last 24 hours',r24==null?'n/a':r24+' mm',r24==null?undefined:r24===0?'Dry.':r24<5?'A little rain.':r24<15?'Quite wet.':'Very wet.',r24>=15?'warn':undefined],['Observed',clock(s.timestamp)+' ('+ago(s.timestamp)+')']];
+  if(f.weatherreport)rows.push(['Forecaster, in Dutch',f.weatherreport.title,trunc(strip(f.weatherreport.summary),260)]);
+  var dn=function(x){return new Date(x.day).toLocaleDateString([],{weekday:'short'})};
+  return {headline:r1(s.temperature)+' °C, '+nlWx(s.weatherdescription)+' at '+name,rows:rows,
+    viz:days.length?[{type:'columns',title:'Chance of rain, next days (%)',data:days.map(function(x){return {label:dn(x),value:+x.rainChance||0,k:x.rainChance>=70?'warn':x.rainChance>=30?'ok':'info'}}),max:100,ticks:days.map(function(x,i){return i})}]:undefined,
+    items:days.map(function(x){return {t:dn(x),x:x.mintemperature+' to '+x.maxtemperature+' °C · rain chance '+x.rainChance+'%'+(+x.mmRainMax?' · up to '+x.mmRainMax+' mm':'')}}),itemsTitle:'Five-day forecast',flag:'Data from Buienradar, which asks for credit: buienradar.nl.'}};
+RUN['nl-luchtmeetnet']=function(c,get,first){var base='https://api.luchtmeetnet.nl/open_api/concentrations?latitude='+c.lat+'&longitude='+c.lon+'&formula=';
+  return Promise.all(['pm10','no2'].map(function(f){return get(base+f).then(function(r){return J(r.text).data},function(){return null})})).then(function(oth){
+    var S=J(first.text).data;if(!S||!S.length)fail('No concentration data for these coordinates');var now=Date.now();
+    function at(a){var j=0;a.forEach(function(p,i){if(new Date(p.timestamp_measured).getTime()<=now+18e5)j=i});return j}
+    var idx=at(S),pm25=S[idx].value,pm10=oth[0]&&oth[0].length?oth[0][at(oth[0])].value:null,no2=oth[1]&&oth[1].length?oth[1][at(oth[1])].value:null,b=bandOf('pm2_5',pm25),rows=[pollRow('pm2_5',r1(pm25))],n=S.length;
+    if(pm10!=null)rows.push(pollRow('pm10',r1(pm10)));if(no2!=null)rows.push(pollRow('nitrogen_dioxide',r1(no2)));rows.push(['Model time',clock(S[idx].timestamp_measured)+' ('+ago(S[idx].timestamp_measured)+')']);
+    return {headline:'PM2.5 '+r1(pm25)+' µg/m³ ('+BAND_WORDS[b].toLowerCase()+')',level:{k:lk(b),label:BAND_WORDS[b],text:AQI_TEXT[b]},rows:rows,
+      viz:[{type:'line',title:'PM2.5, past and coming hours (µg/m³)',pts:S.map(function(p){return {y:p.value}}),now:idx,band:{lo:0,hi:WHO.pm2_5,label:'Under WHO guideline'},ticks:[0,Math.floor((n-1)/2),n-1].map(function(i){return {i:i,label:hhmm(S[i].timestamp_measured)}})}],
+      flag:'Modelled by RIVM (Luchtmeetnet) for your coordinates, not a measurement at your street.'}})};
+R['nl-pdok']=function(t){var d=((J(t).response||{}).docs||[])[0];if(!d)fail('No Dutch address found here');return {headline:d.weergavenaam,rows:[['Municipality',d.gemeentenaam],['Province',d.provincienaam],['Neighbourhood',d.buurtnaam||d.wijknaam],['Town',d.woonplaatsnaam]].filter(function(r){return r[1]})}};
+R['nl-nos']=R['bbc-berks'];
+R['fr-eco2mix']=function(t){var rs=J(t).results||[];if(!rs.length)fail('No data returned');var cur=rs[0],ser=rs.slice().reverse(),co2=cur.taux_co2,n=ser.length;
+  var F=[['nucleaire','Nuclear'],['eolien','Wind'],['hydraulique','Hydro'],['gaz','Gas'],['solaire','Solar'],['bioenergies','Bioenergy'],['charbon','Coal'],['fioul','Oil']];
+  var tot=F.reduce(function(s,k){return s+(cur[k[0]]||0)},0),lvl=co2<35?['good','Very low']:co2<70?['good','Low']:co2<120?['ok','Moderate']:co2<200?['warn','High']:['bad','Very high'];
+  var nuc=tot?Math.round(100*(cur.nucleaire||0)/tot):0,low=tot?Math.round(100*((cur.nucleaire||0)+(cur.eolien||0)+(cur.hydraulique||0)+(cur.solaire||0)+(cur.bioenergies||0))/tot):0;
+  return {headline:co2+' gCO₂/kWh, '+lvl[1].toLowerCase(),level:{k:lvl[0],label:lvl[1],text:low+'% of generation is low-carbon right now ('+nuc+'% nuclear). French power is usually among the cleanest in Europe.'},
+    rows:[['Demand',r1(cur.consommation/1000,1)+' GW'],['Measured',clock(cur.date_heure)+' ('+ago(cur.date_heure)+')']],
+    viz:[{type:'line',title:'Carbon intensity, last '+r1(n/4,0)+' hours (gCO₂/kWh)',pts:ser.map(function(x){return {y:x.taux_co2}}),ticks:[0,Math.floor((n-1)/2),n-1].map(function(i){return {i:i,label:hhmm(ser[i].date_heure)}})},
+      {type:'bars',title:'Generation by source (GW)',data:F.map(function(k){return {label:k[1],value:(cur[k[0]]||0)/1000,text:r1((cur[k[0]]||0)/1000,1)+' GW',k:/Gas|Coal|Oil/.test(k[1])?'warn':'good'}}).filter(function(x){return x.value>0}).sort(function(a,b){return b.value-a.value}),max:Math.max.apply(null,F.map(function(k){return (cur[k[0]]||0)/1000}))}],
+    flag:'National figure from RTE (eCO2mix). It does not vary by place within France.'}};
+R['fr-fuel']=function(t,c){var rs=J(t).results||[];if(!rs.length)return {headline:'No fuel stations within 3 km',flag:'Try a more central place.'};
+  var st=rs.map(function(r){var pr=[];try{pr=JSON.parse(r.prix||'[]')}catch(e){}if(pr&&!Array.isArray(pr))pr=[pr];var P={};(pr||[]).forEach(function(x){P[x['@nom']]={v:+x['@valeur'],m:x['@maj']}});return {a:(r.adresse||'')+', '+(r.ville||''),km:hav(lat0(c),lon0(c),+r.latitude/1e5,+r.longitude/1e5),P:P}}).sort(function(a,b){return a.km-b.km});
+  function cheapest(n){var b=null;st.forEach(function(s){if(s.P[n]&&(!b||s.P[n].v<b.v))b={v:s.P[n].v,s:s,m:s.P[n].m}});return b}
+  var e10=cheapest('E10'),gz=cheapest('Gazole'),rows=[];
+  if(e10){var all=st.filter(function(s){return s.P.E10}).map(function(s){return s.P.E10.v}),lo=Math.min.apply(null,all),hi=Math.max.apply(null,all);
+    rows.push(['Cheapest E10',e10.v.toFixed(3)+' €/L',e10.s.a+' · '+distTxt(e10.s.km)+' · updated '+clock(e10.m)]);rows.push(['E10 price range',lo.toFixed(3)+' to '+hi.toFixed(3)+' €/L','A spread of '+Math.round(100*(hi-lo))+' cents across '+all.length+' stations. Worth checking before you fill up.'])}
+  if(gz)rows.push(['Cheapest diesel (Gazole)',gz.v.toFixed(3)+' €/L',gz.s.a+' · '+distTxt(gz.s.km)]);
+  return {headline:e10?'Cheapest E10 nearby: '+e10.v.toFixed(3)+' €/L':st.length+' stations nearby',rows:rows,
+    items:st.slice(0,8).map(function(s){return {t:distTxt(s.km),x:s.a+' · '+['E10','Gazole','SP98'].filter(function(k){return s.P[k]}).map(function(k){return k+' '+s.P[k].v.toFixed(3)}).join(' · ')}}),itemsTitle:'Nearest first',flag:'Official prices reported by stations (data.economie.gouv.fr). Stations update at different times.'}};
+R['fr-adresse']=function(t){var f=(J(t).features||[])[0];if(!f)fail('No French address found here');var p=f.properties;return {headline:p.label,rows:[['City',p.city],['Postcode',p.postcode],['Department and region',(p.context||'')],['Distance to that address',p.distance!=null?p.distance+' m':'']].filter(function(r){return r[1]})}};
+R['fr-hubeau']=function(t){if(/^\s*</.test(t))fail('Hub’Eau returned a web page instead of data.');var d=J(t),a=d.data||[];if(!a.length)return {headline:'No river readings within 40 km',flag:'Hub’Eau returned no data for this area.'};
+  return {headline:a.length+' river readings nearby, newest '+ago(a[0].date_obs),items:a.slice(0,8).map(function(x){var h=x.grandeur_hydro==='H';return {t:clock(x.date_obs),x:(x.libelle_station||x.code_station||'Station')+': '+(h?r1(x.resultat_obs/1000,2)+' m':r1(x.resultat_obs/1000,1)+' m³/s')}}),itemsTitle:'Latest readings',flag:'River height from French monitoring stations (Hub’Eau, Etalab licence). Not compared against normal ranges yet.'}};
+RUN['fr-velib']=function(c,get,first){var S=J(first.text).data.stations;return get('https://velib-metropole-opendata.smoove.pro/opendata/Velib_Metropole/station_information.json').then(function(r){var I=J(r.text).data.stations,M={};I.forEach(function(x){M[x.station_id]=x});
+  var rows=S.map(function(s){var i=M[s.station_id];return i?{n:i.name,km:hav(lat0(c),lon0(c),i.lat,i.lon),b:s.num_bikes_available,d:s.num_docks_available,ty:s.num_bikes_available_types}:null}).filter(Boolean).sort(function(a,b){return a.km-b.km}),near=rows.slice(0,6),tot=S.reduce(function(a,s){return a+(s.num_bikes_available||0)},0);
+  function ty(x){var m=0,e=0;(x.ty||[]).forEach(function(o){if(o.mechanical!=null)m=o.mechanical;if(o.ebike!=null)e=o.ebike});return m||e?' ('+m+' mechanical, '+e+' electric)':''}
+  return {headline:near[0]?near[0].b+' bikes at the nearest Vélib’ station, '+distTxt(near[0].km)+' away':'No stations found',rows:[['Bikes available across Paris',tot],['Stations in the network',S.length]],items:near.map(function(x){return {t:distTxt(x.km),x:x.n+': '+x.b+' bikes'+ty(x)+', '+x.d+' free docks'}}),itemsTitle:'Nearest stations',flag:'Paris and nearby suburbs only.'}})};
+R['gbfs']=function(t,c){var rows=t.trim().split('\n'),cc=String(c.cc||'').toUpperCase(),mine=rows.slice(1).filter(function(r){return r.indexOf(cc+',')===0});
+  return {headline:(rows.length-1)+' bike and scooter systems worldwide, '+mine.length+' in '+(CCNAME[cc]||cc||'your country'),items:mine.slice(0,8).map(function(r){var p=r.split(',');return {t:p[0],x:(p[1]||'')+' ('+(p[2]||'')+')'}}),itemsTitle:'Systems in your country'}};
+R['nager']=function(t,c){if(!t.trim())return {headline:'No public-holiday data for this country',flag:'The service does not cover '+(CCNAME[String(c.cc).toUpperCase()]||'it')+'.'};var d=J(t);
+  function inDays(s){var n=Math.round((new Date(s+'T00:00:00Z')-new Date(new Date().toISOString().slice(0,10)+'T00:00:00Z'))/864e5);return n===0?'today':n===1?'tomorrow':'in '+n+' days'}
+  return {headline:'Next: '+d[0].localName+' ('+d[0].name+'), '+inDays(d[0].date),items:d.slice(0,5).map(function(x){return {t:inDays(x.date),x:x.localName+' · '+x.name+' ('+x.date+')'}})}};
+var COUNTRY_NOTES={IL:'Israel has very few free, live, browser-callable public data feeds. Emergency alerts should come from the official Home Front Command app, not from third-party copies. The weather service (IMS) and real-time transport need registration. So here the board relies on the global sources: weather, air quality with a desert-dust reading, Mediterranean sea state, earthquakes and wildfires, Wikipedia and OpenStreetMap.',
+  NL:'The Dutch national feeds listed here are free and open. Rijkswaterstaat river levels and NDW traffic data are published as files and need a server.',
+  FR:'Hub’Eau (rivers) and Vélib’ did not answer from my test server, so those two are flagged unverified. Météo-France, SNCF and Île-de-France Mobilités need free keys.'};
 
 /* ---------- charts and pictures ---------- */
 /* A preview may carry viz:[...], cards:[...], images:[...]. Specs are plain data; these functions draw them as HTML/SVG. */
@@ -601,6 +682,9 @@ wrapRUN('ea-rain',function(pv,c,get){if(!pv._m)return;return get(String(pv._m).r
   var hh=hhmm,tot=it.reduce(function(s,x){return s+x.value},0);
   pv.viz=[{type:'columns',title:'Rain at the nearest gauge, last '+Math.round(it.length/4)+' hours (mm per 15 minutes)',data:it.map(function(x){return {label:hh(x.dateTime),value:x.value,k:x.value*4>=2.5?'warn':'ok'}}),max:1,ticks:[0,Math.floor((it.length-1)/2),it.length-1],note:r1(tot,1)+' mm in total over this period.'}]})});
 
+var EU_CC=['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','GB','IS','NO','CH','IL','RS','BA','ME','MK','MD','UA'];
+var SCOPE_CC={Global:'*',UK:['GB'],London:['GB'],England:['GB'],US:['US'],Germany:['DE'],Finland:['FI'],Nordics:['NO','SE','FI','DK','IS'],Europe:EU_CC,NL:['NL'],FR:['FR'],IL:['IL']};
+SRC.forEach(function(s){s.cc=SCOPE_CC[s.scope]||'*'});
 /* Per-source overrides: request headers, heavy files skipped by "Load all", and what an earlier server-side probe predicted. */
 var EXTRA={
   fsa:{headers:{'x-api-version':'2','Accept':'application/json'}},
@@ -626,12 +710,15 @@ if(IN_BROWSER){(function(){
 var $=function(s,r){return (r||document).querySelector(s)};
 function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
 function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
-var PRESETS=[{n:'Windsor',lat:'51.4839',lon:'-0.6044',pc:'SL4'},{n:'Guildford',lat:'51.2362',lon:'-0.5704',pc:'GU1'},{n:'London',lat:'51.5072',lon:'-0.1276',pc:'SW1A'},{n:'New York',lat:'40.7128',lon:'-74.0060',pc:''},{n:'Oslo',lat:'59.9139',lon:'10.7522',pc:''}];
-var ctx={place:'Windsor',lat:'51.4839',lon:'-0.6044',pc:'SL4'};
-try{var sv=JSON.parse(lsGet('hlx-ctx')||'null');if(sv&&sv.lat&&sv.lon)ctx=sv}catch(e){}
+var PRESETS=[{n:'Windsor',cc:'GB',lat:'51.4839',lon:'-0.6044',pc:'SL4'},{n:'London',cc:'GB',lat:'51.5072',lon:'-0.1276',pc:'SW1A'},{n:'Amsterdam',cc:'NL',lat:'52.3676',lon:'4.9041',pc:''},{n:'Paris',cc:'FR',lat:'48.8566',lon:'2.3522',pc:''},{n:'Tel Aviv',cc:'IL',lat:'32.0853',lon:'34.7818',pc:''},{n:'New York',cc:'US',lat:'40.7128',lon:'-74.0060',pc:''}];
+var COUNTRIES=[['GB','United Kingdom'],['NL','Netherlands'],['FR','France'],['IL','Israel'],['US','United States'],['DE','Germany'],['FI','Finland'],['NO','Norway'],['--','Another country']];
+var ctx={place:'Windsor',cc:'GB',lat:'51.4839',lon:'-0.6044',pc:'SL4'},saved=null;
+try{saved=JSON.parse(lsGet('hlx-ctx')||'null');if(saved&&saved.lat&&saved.lon)ctx=saved;else saved=null}catch(e){saved=null}
 var verdicts={};try{verdicts=JSON.parse(lsGet('hlx-v')||'{}')}catch(e){}
-var results={},F={cat:'all',q:''},gen=0,queue=[],active=0,MAX=4;
+var results={},F={cat:'all',q:'',other:false},gen=0,queue=[],active_=0,MAX=4,detecting=false,detectMsg='';
 var TESTABLE=SRC.filter(function(s){return s.u}),BYID={};TESTABLE.forEach(function(s){BYID[s.id]=s});
+function cc(){return String(ctx.cc||'').toUpperCase()}
+function isActive(s){return F.other||s.cc==='*'||(s.cc&&s.cc.indexOf(cc())>=0)}
 function valid(){var a=parseFloat(ctx.lat),b=parseFloat(ctx.lon);return isFinite(a)&&isFinite(b)&&Math.abs(a)<=90&&Math.abs(b)<=180}
 function urlFor(s){if(!valid())return null;try{return s.u(ctx)}catch(e){return null}}
 
@@ -646,15 +733,15 @@ function generic(t){var d;try{d=J(t)}catch(e){var it=rss(t);if(it.length)return 
   if(Array.isArray(d))return {headline:d.length+' items',rows:d[0]&&typeof d[0]==='object'?Object.keys(d[0]).slice(0,6).map(function(k){return [k,trunc(JSON.stringify(d[0][k]),80)]}):[]};
   return {headline:'JSON object with '+Object.keys(d).length+' fields',rows:Object.keys(d).slice(0,8).map(function(k){return [k,trunc(JSON.stringify(d[k]),80)]})}}
 
-/* load one source; queue limits concurrency to 4 */
-function load(id){var s=BYID[id],url=urlFor(s),g=gen;if(!url)return Promise.resolve();
+function load(id){var s=BYID[id],url=urlFor(s),g=gen;
+  if(!url){results[id]={state:'err',msg:'Not available for this place (for example it needs a UK postcode, or the country is not covered).',soft:true,at:Date.now()};paint(id);summary();return Promise.resolve()}
   results[id]={state:'loading'};paint(id);var t0=performance.now();
   return get(url,{headers:s.headers}).then(function(r){
     var p=s.run?RUN[s.run](ctx,function(u){return get(u)},r):Promise.resolve((R[id]||generic)(r.text,ctx,s));
     return Promise.resolve(p).then(function(pv){if(g!==gen)return;results[id]={state:'ok',ms:Math.round(performance.now()-t0),pv:pv,raw:r.text,at:Date.now(),status:r.status}})
   }).catch(function(e){if(g!==gen)return;results[id]={state:'err',ms:e.ms||Math.round(performance.now()-t0),msg:e.message,blocked:!!e.blocked,status:e.status,raw:e.raw,at:Date.now(),soft:!!e.soft}}).then(function(){if(g!==gen)return;paint(id);summary()})}
 function enqueue(id,force){var r=results[id];if(!BYID[id]||(!force&&r&&(r.state==='ok'||r.state==='loading'||r.state==='err')))return;if(queue.indexOf(id)<0)queue.push(id);pump()}
-function pump(){while(active<MAX&&queue.length){var id=queue.shift();active++;load(id).then(function(){active--;pump()},function(){active--;pump()})}}
+function pump(){while(active_<MAX&&queue.length){var id=queue.shift();active_++;load(id).then(function(){active_--;pump()},function(){active_--;pump()})}}
 
 /* ---------- drawing ---------- */
 function pvHTML(pv){var h='<p class="head">'+esc(pv.headline||'')+'</p>';
@@ -683,41 +770,61 @@ function paint(id){var el=document.getElementById('c-'+id);if(!el)return;var r=r
   box.innerHTML='<div class="pv">'+pvHTML(r.pv)+'</div><p class="st ok">Live from this device <span class="ms">'+r.ms+' ms · updated '+new Date(r.at).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})+'</span></p><details class="raw"><summary>Raw response</summary><pre>'+esc(trunc(r.raw,2500))+'</pre></details>'}
 
 var io=('IntersectionObserver' in window)?new IntersectionObserver(function(es){es.forEach(function(e){if(!e.isIntersecting)return;var id=e.target.id.slice(2);io.unobserve(e.target);if(!BYID[id].heavy)enqueue(id)})},{rootMargin:'700px 0px'}):null;
-function renderList(){var q=F.q.toLowerCase(),html='';
-  CATS.forEach(function(c){if(F.cat!=='all'&&F.cat!==c.id)return;var items=TESTABLE.filter(function(s){return s.cat===c.id&&(!q||(s.name+' '+s.desc).toLowerCase().indexOf(q)>=0)});if(!items.length)return;
+function renderList(){var q=F.q.toLowerCase(),html='',act=TESTABLE.filter(isActive);
+  CATS.forEach(function(c){if(F.cat!=='all'&&F.cat!==c.id)return;var items=act.filter(function(s){return s.cat===c.id&&(!q||(s.name+' '+s.desc).toLowerCase().indexOf(q)>=0)});if(!items.length)return;
     html+='<section class="group"><h2>'+esc(c.name)+'<span class="count">'+items.length+'</span></h2>'+items.map(card).join('')+'</section>'});
   $('#list').innerHTML=html||'<p class="empty">No sources match.</p>';
-  TESTABLE.forEach(function(s){var el=document.getElementById('c-'+s.id);if(!el)return;paint(s.id);var r=results[s.id];if(!r&&!s.heavy){if(io)io.observe(el);else enqueue(s.id)}})}
-function summary(){var ok=0,bad=0,blocked=0,wait=0;TESTABLE.forEach(function(s){var r=results[s.id];if(!r)return;if(r.state==='ok')ok++;else if(r.state==='err'){bad++;if(r.blocked)blocked++}else wait++});
+  act.forEach(function(s){var el=document.getElementById('c-'+s.id);if(!el)return;paint(s.id);var r=results[s.id];if(!r&&!s.heavy){if(io)io.observe(el);else enqueue(s.id)}});
+  /* categories that have something active */
+  $('#cats').innerHTML=[{id:'all',name:'All'}].concat(CATS.filter(function(c){return act.some(function(s){return s.cat===c.id})})).map(function(c){return '<button class="chip" data-cat="'+c.id+'" aria-pressed="'+(c.id===F.cat)+'">'+esc(c.name)+'</button>'}).join('');
+  var glob=act.filter(function(s){return s.cc==='*'}).length,loc=act.length-glob,hidden=TESTABLE.length-TESTABLE.filter(function(s){return s.cc==='*'||(s.cc&&s.cc.indexOf(cc())>=0)}).length;
+  var name=COUNTRY_LABEL(cc());
+  $('#ccstatus').textContent=(detecting?'Detecting your location… ':'')+(detectMsg?detectMsg+' ':'')+(valid()?'Showing '+act.length+' sources: '+glob+' that work anywhere'+(loc?' and '+loc+' for '+name:'')+'.'+(!F.other&&hidden?' '+hidden+' for other countries are hidden.':''):'Enter a valid location.');
+  $('#ccnote').textContent=COUNTRY_NOTES[cc()]||'';$('#ccnote').hidden=!COUNTRY_NOTES[cc()];
+  var nt=NOT_TESTABLE.filter(function(s){return F.other||s.cc==='*'||(s.cc&&s.cc.indexOf(cc())>=0)});
+  $('#nt').innerHTML=nt.map(function(s){return '<li><b>'+esc(s.name)+'</b> <span>'+esc(s.scope)+' · '+esc({key:'needs a key',oauth:'needs a login',paid:'paid or limited',closed:'closed',unknown:'no known endpoint',open:'no direct call yet'}[s.auth]||'')+'</span><br>'+esc(s.note||s.desc)+'</li>'}).join('');
+  summary()}
+function COUNTRY_LABEL(c){var m={GB:'the UK',NL:'the Netherlands',FR:'France',IL:'Israel',US:'the United States',DE:'Germany',FI:'Finland',NO:'Norway'};return m[c]||(c?c:'your country')}
+function summary(){var ok=0,bad=0,blocked=0,wait=0;TESTABLE.filter(isActive).forEach(function(s){var r=results[s.id];if(!r)return;if(r.state==='ok')ok++;else if(r.state==='err'){bad++;if(r.blocked)blocked++}else wait++});
   $('#sum').textContent=(ok||bad)?ok+' working · '+bad+' failed'+(blocked?' ('+blocked+' blocked by the browser)':'')+(wait?' · '+wait+' loading':''):'Loading…'}
 
-/* ---------- controls ---------- */
-function setCtx(c){ctx=c;lsSet('hlx-ctx',JSON.stringify(ctx));gen++;queue=[];results={};syncFields();renderList();summary()}
-function syncFields(){$('#f-place').value=ctx.place||'';$('#f-pc').value=ctx.pc||'';$('#f-lat').value=ctx.lat||'';$('#f-lon').value=ctx.lon||'';
+/* ---------- location: detect, then activate ---------- */
+function resolveCountry(c){return get('https://nominatim.openstreetmap.org/reverse?lat='+c.lat+'&lon='+c.lon+'&format=jsonv2&zoom=10&accept-language=en').then(function(r){var a=J(r.text).address||{},code=(a.country_code||'').toUpperCase();
+  return {cc:code||'--',place:a.city||a.town||a.village||a.suburb||a.municipality||a.county||'',pc:code==='GB'?((a.postcode||'').split(' ')[0]||'').toUpperCase():''}})}
+function detectIP(){return get('https://ipwho.is/').then(function(r){var d=J(r.text);if(d.success===false||d.latitude==null)throw new Error('no ip location');return {place:d.city||'',cc:(d.country_code||'').toUpperCase()||'--',lat:(+d.latitude).toFixed(4),lon:(+d.longitude).toFixed(4),pc:''}})}
+function setCtx(c,msg){ctx=c;detectMsg=msg||'';lsSet('hlx-ctx',JSON.stringify(ctx));gen++;queue=[];results={};syncFields();renderList();
+  if(!c.cc&&valid()){detecting=true;renderList();var g=gen;resolveCountry(c).then(function(x){if(g!==gen)return;detecting=false;var n={place:c.place||x.place,cc:x.cc,lat:c.lat,lon:c.lon,pc:c.pc||x.pc};setCtx(n,detectMsg)},function(){detecting=false;if(g!==gen)return;setCtx({place:c.place,cc:'--',lat:c.lat,lon:c.lon,pc:c.pc},'Could not work out the country, so only worldwide sources are shown. Pick a country above.')})}}
+function syncFields(){$('#f-place').value=ctx.place||'';$('#f-pc').value=ctx.pc||'';$('#f-lat').value=ctx.lat||'';$('#f-lon').value=ctx.lon||'';$('#f-cc').value=COUNTRIES.some(function(x){return x[0]===cc()})?cc():'--';$('#f-pc').closest('label').hidden=cc()!=='GB';
   document.querySelectorAll('[data-preset]').forEach(function(b){var p=PRESETS.filter(function(x){return x.n===b.dataset.preset})[0];b.setAttribute('aria-pressed',p&&p.lat===ctx.lat&&p.lon===ctx.lon?'true':'false')})}
-var lt;['#f-place','#f-pc','#f-lat','#f-lon'].forEach(function(s){$(s).addEventListener('input',function(){clearTimeout(lt);lt=setTimeout(function(){setCtx({place:$('#f-place').value.trim(),pc:$('#f-pc').value.trim().toUpperCase(),lat:$('#f-lat').value.trim(),lon:$('#f-lon').value.trim()})},600)})});
+var lt;['#f-place','#f-pc','#f-lat','#f-lon'].forEach(function(s){$(s).addEventListener('input',function(){clearTimeout(lt);lt=setTimeout(function(){var moved=$('#f-lat').value.trim()!==ctx.lat||$('#f-lon').value.trim()!==ctx.lon;
+  setCtx({place:$('#f-place').value.trim(),pc:$('#f-pc').value.trim().toUpperCase(),lat:$('#f-lat').value.trim(),lon:$('#f-lon').value.trim(),cc:moved?'':ctx.cc})},700)})});
+$('#f-cc').addEventListener('change',function(e){setCtx({place:ctx.place,pc:ctx.pc,lat:ctx.lat,lon:ctx.lon,cc:e.target.value})});
+$('#showother').addEventListener('change',function(e){F.other=e.target.checked;renderList()});
 $('#geo').addEventListener('click',function(){var m=$('#geomsg');if(!navigator.geolocation){m.textContent='This browser has no location access.';return}
-  m.textContent='Asking for your location…';
-  navigator.geolocation.getCurrentPosition(function(p){var c={place:ctx.place,pc:'',lat:p.coords.latitude.toFixed(4),lon:p.coords.longitude.toFixed(4)};m.textContent='Got it. Looking up the place name…';setCtx(c);
-    get('https://nominatim.openstreetmap.org/reverse?lat='+c.lat+'&lon='+c.lon+'&format=jsonv2&zoom=14').then(function(r){var a=J(r.text).address||{};var c2={lat:c.lat,lon:c.lon,place:a.suburb||a.village||a.town||a.city||c.place,pc:((a.postcode||'').split(' ')[0]||'').toUpperCase()};setCtx(c2);m.textContent='Location set to '+c2.place+'.'},function(){m.textContent='Location set. Enter a place name above.'})},
-    function(e){m.textContent='Location was refused or unavailable ('+(e&&e.message||'error')+'). Type coordinates instead.'},{enableHighAccuracy:false,timeout:15000})});
+  m.textContent='Asking your device for its location…';
+  navigator.geolocation.getCurrentPosition(function(p){m.textContent='Got it.';setCtx({place:'',pc:'',cc:'',lat:p.coords.latitude.toFixed(4),lon:p.coords.longitude.toFixed(4)},'Detected from your device.')},
+    function(e){m.textContent='Location was refused or unavailable ('+(e&&e.message||'error')+'). Choose a place below, or type coordinates.'},{enableHighAccuracy:false,timeout:15000})});
 document.addEventListener('click',function(e){var t=e.target.closest('button');if(!t)return;
-  if(t.dataset.preset){var p=PRESETS.filter(function(x){return x.n===t.dataset.preset})[0];setCtx({place:p.n,lat:p.lat,lon:p.lon,pc:p.pc});return}
-  if(t.dataset.cat){F.cat=t.dataset.cat;document.querySelectorAll('[data-cat]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.cat===F.cat?'true':'false')});renderList();return}
+  if(t.dataset.preset){var p=PRESETS.filter(function(x){return x.n===t.dataset.preset})[0];setCtx({place:p.n,cc:p.cc,lat:p.lat,lon:p.lon,pc:p.pc},'');return}
+  if(t.dataset.cat){F.cat=t.dataset.cat;renderList();return}
   if(t.dataset.load){enqueue(t.dataset.load,true);return}
   if(t.dataset.v){var id=t.closest('.card').id.slice(2);if(verdicts[id]===t.dataset.v)delete verdicts[id];else verdicts[id]=t.dataset.v;lsSet('hlx-v',JSON.stringify(verdicts));paint(id);return}
 });
 $('#q').addEventListener('input',function(e){F.q=e.target.value.trim();renderList()});
 $('#hidefail').addEventListener('change',function(e){$('#list').classList.toggle('hidefail',e.target.checked)});
-$('#all').addEventListener('click',function(){TESTABLE.filter(function(s){return !s.heavy&&(F.cat==='all'||s.cat===F.cat)&&document.getElementById('c-'+s.id)}).forEach(function(s){enqueue(s.id,true)})});
-$('#copy').addEventListener('click',function(){var rep=TESTABLE.filter(function(s){return results[s.id]||verdicts[s.id]}).map(function(s){var r=results[s.id]||{};return {id:s.id,name:s.name,verdict:verdicts[s.id]||null,works:r.state==='ok'?true:(r.state==='err'?false:null),ms:r.ms||null,blocked:r.blocked||undefined,error:r.state==='err'?r.msg:undefined,headline:r.pv&&r.pv.headline||undefined,meaning:r.pv&&r.pv.level?r.pv.level.label+': '+r.pv.level.text:undefined}});
-  var out={place:ctx.place,lat:ctx.lat,lon:ctx.lon,when:new Date().toISOString(),ua:navigator.userAgent,results:rep},txt=JSON.stringify(out,null,1),ta=$('#report');ta.value=txt;ta.hidden=false;
+$('#all').addEventListener('click',function(){TESTABLE.filter(function(s){return isActive(s)&&!s.heavy&&(F.cat==='all'||s.cat===F.cat)&&document.getElementById('c-'+s.id)}).forEach(function(s){enqueue(s.id,true)})});
+$('#copy').addEventListener('click',function(){var rep=TESTABLE.filter(function(s){return results[s.id]||verdicts[s.id]}).map(function(s){var r=results[s.id]||{};return {id:s.id,name:s.name,scope:s.scope,verdict:verdicts[s.id]||null,works:r.state==='ok'?true:(r.state==='err'?false:null),ms:r.ms||null,blocked:r.blocked||undefined,error:r.state==='err'?r.msg:undefined,headline:r.pv&&r.pv.headline||undefined,meaning:r.pv&&r.pv.level?r.pv.level.label+': '+r.pv.level.text:undefined}});
+  var out={place:ctx.place,country:cc(),lat:ctx.lat,lon:ctx.lon,when:new Date().toISOString(),ua:navigator.userAgent,results:rep},txt=JSON.stringify(out,null,1),ta=$('#report');ta.value=txt;ta.hidden=false;
   (navigator.clipboard&&navigator.clipboard.writeText?navigator.clipboard.writeText(txt):Promise.reject()).then(function(){$('#copymsg').textContent='Copied. Paste it into the chat.'},function(){ta.select();$('#copymsg').textContent='Select all and copy, then paste it into the chat.'})});
 
 /* boot */
-$('#cats').innerHTML=[{id:'all',name:'All'}].concat(CATS.filter(function(c){return TESTABLE.some(function(s){return s.cat===c.id})})).map(function(c){return '<button class="chip" data-cat="'+c.id+'" aria-pressed="'+(c.id==='all')+'">'+esc(c.name)+'</button>'}).join('');
+$('#f-cc').innerHTML=COUNTRIES.map(function(x){return '<option value="'+x[0]+'">'+esc(x[1])+'</option>'}).join('');
 $('#presets').innerHTML=PRESETS.map(function(p){return '<button class="chip" data-preset="'+esc(p.n)+'" aria-pressed="false">'+esc(p.n)+'</button>'}).join('');
-$('#nt').innerHTML=NOT_TESTABLE.map(function(s){return '<li><b>'+esc(s.name)+'</b> <span>'+esc(s.scope)+' · '+esc({key:'needs a key',oauth:'needs a login',paid:'paid or limited',closed:'closed',unknown:'no known endpoint',open:'no direct call yet'}[s.auth]||'')+'</span><br>'+esc(s.note||s.desc)+'</li>'}).join('');
-syncFields();renderList();summary();
+syncFields();
+if(saved&&saved.cc){renderList()}
+else if(saved){setCtx(saved,'')}   /* an older saved place without a country: work it out */
+else{ /* first visit: find an approximate location from the connection, no permission prompt */
+  detecting=true;renderList();
+  detectIP().then(function(d){detecting=false;setCtx(d,'Approximate, from your internet connection. Tap “Use my location” for a precise fix.')},function(){detecting=false;setCtx(ctx,'Could not detect your location, so Windsor is shown. Choose a place below.')})}
 })()}
 if(typeof module!=='undefined')module.exports={SRC:SRC,R:R,RUN:RUN,CATS:CATS,vizHTML:vizHTML,cardsHTML:cardsHTML,galleryHTML:galleryHTML,TESTABLE:SRC.filter(function(s){return s.u})};

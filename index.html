@@ -14,7 +14,7 @@
   <header>
     <div class="eyebrow">Experiment · live from your browser</div>
     <h1>Hyperlocal Source Explorer</h1>
-    <p class="lede">Every source is called live from this device as you scroll, and shown in plain language with what the numbers mean. A source that fails here would also fail in a real app, so this is the honest test.</p>
+    <p class="lede">The page finds where you are, switches on the sources that cover your country, then calls each one live from this device as you scroll and explains the numbers in plain language. A source that fails here would also fail in a real app, so this is the honest test.</p>
   </header>
 
   <section class="loc" aria-labelledby="lh">
@@ -23,12 +23,16 @@
     <p class="msg" id="geomsg"></p>
     <div class="fields">
       <label>Place name<input id="f-place" autocomplete="off"></label>
+      <label>Country<select id="f-cc"></select></label>
       <label>Outward postcode (UK)<input id="f-pc" autocomplete="off" placeholder="SL4"></label>
       <label>Latitude<input id="f-lat" inputmode="decimal" autocomplete="off"></label>
       <label>Longitude<input id="f-lon" inputmode="decimal" autocomplete="off"></label>
     </div>
     <div class="presets" id="presets" role="group" aria-label="Preset places"></div>
-    <p class="msg">Your location stays in this browser. It is sent only to the data provider behind a source you tap.</p>
+    <p class="msg" id="ccstatus" aria-live="polite"></p>
+    <p class="msg note" id="ccnote" hidden></p>
+    <label class="chk"><input type="checkbox" id="showother"> Show sources for other countries</label>
+    <p class="msg">Your location stays in this browser. It is sent only to the data provider behind a source that loads.</p>
   </section>
 
   <div class="bar">
