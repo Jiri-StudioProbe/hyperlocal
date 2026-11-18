@@ -26,7 +26,7 @@ function slug(c){return String(c.place||'').toLowerCase().replace(/[^a-z0-9]/g,'
 
 /* weather */
 add('weather','om-forecast','Open-Meteo forecast','Global','open','live','r','keep','Current conditions, 15-minute rain and an hourly forecast for any coordinates.',{
-  u:function(c){return 'https://api.open-meteo.com/v1/forecast?latitude='+c.lat+'&longitude='+c.lon+'&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,wind_gusts_10m,weather_code&daily=temperature_2m_max,temperature_2m_min&minutely_15=precipitation&forecast_minutely_15=8&forecast_days=1&timezone=auto'},
+  u:function(c){return 'https://api.open-meteo.com/v1/forecast?latitude='+c.lat+'&longitude='+c.lon+'&current=temperature_2m,apparent_temperature,precipitation,wind_speed_10m,wind_gusts_10m,weather_code&daily=temperature_2m_max,temperature_2m_min&hourly=temperature_2m&minutely_15=precipitation&forecast_minutely_15=8&forecast_days=2&timezone=auto'},
   docs:'https://open-meteo.com/en/docs',note:'Free for non-commercial use, about 10,000 calls a day. 15-minute data is native in Central Europe and North America and interpolated elsewhere.'});
 add('weather','om-ukmo','Open-Meteo on the Met Office UK model','UK','open','hourly','r','keep','The same API pinned to the Met Office 2 km UK model.',{
   u:function(c){return 'https://api.open-meteo.com/v1/forecast?latitude='+c.lat+'&longitude='+c.lon+'&models=ukmo_seamless&current=temperature_2m,precipitation,wind_speed_10m,weather_code&hourly=temperature_2m,precipitation&forecast_hours=6&timezone=auto'},
@@ -180,9 +180,9 @@ add('places','overpass','OpenStreetMap Overpass','Global','open','daily','r','ke
 add('places','osmnotes','OpenStreetMap map notes','Global','open','live','m','maybe','Recent “this is wrong or missing” notes left on the map nearby.',{
   u:function(c){var b=bb(c,0.05);return 'https://api.openstreetmap.org/api/0.6/notes.json?bbox='+b.w+','+b.s+','+b.e+','+b.n+'&limit=10'},docs:'https://wiki.openstreetmap.org/wiki/API_v0.6#Map_Notes_API',note:'An odd but genuinely local signal.'});
 add('places','wiki-geo','Wikipedia nearby articles','Global','open','static','m','keep','Articles about places within a radius.',{
-  u:function(c){return 'https://en.wikipedia.org/w/api.php?action=query&list=geosearch&gscoord='+enc(c.lat+'|'+c.lon)+'&gsradius=2000&gslimit=10&format=json&origin=*'},docs:'https://www.mediawiki.org/wiki/API:Geosearch',note:'Gives each tile a “story of this place” link.'});
+  u:function(c){return 'https://en.wikipedia.org/w/api.php?action=query&generator=geosearch&ggscoord='+enc(c.lat+'|'+c.lon)+'&ggsradius=2000&ggslimit=8&prop=extracts%7Cpageimages%7Ccoordinates&exintro=1&explaintext=1&exsentences=3&exlimit=max&piprop=thumbnail&pithumbsize=240&colimit=max&format=json&formatversion=2&origin=*'},docs:'https://www.mediawiki.org/wiki/API:Geosearch',note:'Gives each tile a “story of this place” link.'});
 add('places','commons','Wikimedia Commons nearby photos','Global','open','static','m','maybe','Geotagged freely licensed images near a point.',{
-  u:function(c){return 'https://commons.wikimedia.org/w/api.php?action=query&list=geosearch&gscoord='+enc(c.lat+'|'+c.lon)+'&gsradius=1000&gsnamespace=6&gslimit=10&format=json&origin=*'},docs:'https://www.mediawiki.org/wiki/API:Geosearch',note:'Licence varies per image.'});
+  u:function(c){return 'https://commons.wikimedia.org/w/api.php?action=query&generator=geosearch&ggscoord='+enc(c.lat+'|'+c.lon)+'&ggsradius=1000&ggsnamespace=6&ggslimit=8&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=360&iiextmetadatafilter=LicenseShortName%7CArtist&format=json&formatversion=2&origin=*'},docs:'https://www.mediawiki.org/wiki/API:Geosearch',note:'Licence varies per image.'});
 add('places','fsa','Food hygiene ratings (FSA)','UK','open','daily','r','maybe','Rating and score for about 600k food businesses, with coordinates.',{
   u:function(c){return 'https://api.ratings.food.gov.uk/Establishments?latitude='+c.lat+'&longitude='+c.lon+'&maxDistanceLimit=1&pageSize=10&sortOptionKey=distance'},docs:'https://api.ratings.food.gov.uk/help',note:'Needs an x-api-version: 2 header, so this link shows an error. Probed with the header it works, and the CORS preflight allows that header, so a browser can call it directly. Not time-sensitive.'});
 add('places','planning','Planning Data constraints','England','open','daily','r','maybe','Conservation areas, listed buildings, flood zones and more at a point.',{
@@ -269,7 +269,7 @@ add('sky','sunapi','Sunrise-Sunset.org','Global','open','daily','m','scrap','Sun
 
 /* nature */
 add('nature','inat','iNaturalist observations','Global','open','live','m','keep','Recent wildlife sightings within 3 km, with photos.',{
-  u:function(c){return 'https://api.inaturalist.org/v1/observations?lat='+c.lat+'&lng='+c.lon+'&radius=3&order_by=observed_on&order=desc&per_page=10'},docs:'https://api.inaturalist.org/v1/docs/',note:'About one request a second. Locations of sensitive species are obscured.'});
+  u:function(c){return 'https://api.inaturalist.org/v1/observations?lat='+c.lat+'&lng='+c.lon+'&radius=3&order_by=observed_on&order=desc&per_page=8'},docs:'https://api.inaturalist.org/v1/docs/',note:'About one request a second. Locations of sensitive species are obscured.'});
 add('nature','ebird','eBird recent sightings','Global','key','daily','m','maybe','Recent bird sightings and hotspots near a point.',{docs:'https://documenter.getpostman.com/view/664302/S1ENwy59',note:'Free key, non-commercial terms.'});
 add('nature','gbif','GBIF occurrences','Global','open','monthly','m','scrap','Archived species records near a point.',{
   u:function(c){return 'https://api.gbif.org/v1/occurrence/search?decimalLatitude='+(c.lat-0.05).toFixed(4)+','+(+c.lat+0.05).toFixed(4)+'&decimalLongitude='+(c.lon-0.05).toFixed(4)+','+(+c.lon+0.05).toFixed(4)+'&limit=5'},docs:'https://www.gbif.org/developer/occurrence',note:'Mostly historical records; iNaturalist is fresher.'});
@@ -341,8 +341,6 @@ R['postcodes']=function(t){var d=J(t),r=d.result;if(!r||!r.length)return {headli
 R['postcodes-out']=function(t){var d=J(t),r=d.result;return {headline:r.outcode+' covers '+(r.admin_district||[]).join(', '),rows:[['Parishes',(r.parish||[]).slice(0,4).join(', ')],['Centre',r.latitude+', '+r.longitude]]}};
 R['ipwho']=function(t){var d=J(t);return {headline:d.city+', '+d.region+', '+d.country,rows:[['Timezone',d.timezone&&d.timezone.id],['Connection',d.connection&&d.connection.isp]],flag:'This is where the internet thinks you are, from your IP address. Compare it with your real location to judge how good it is.'}};
 R['osmnotes']=function(t){var d=J(t),f=d.features||[];return {headline:f.length+' map notes nearby, newest '+(f[0]?ago(f[0].properties.date_created.replace(' UTC','').replace(' ','T')+'Z'):'n/a'),items:f.slice(0,6).map(function(x){var c=x.properties.comments[0]||{};return {t:(x.properties.date_created||'').slice(0,10),x:trunc(strip(c.text),100)||'(no text)'}}),itemsTitle:'Notes'}};
-R['wiki-geo']=function(t){var d=J(t).query.geosearch;return {headline:d.length+' articles within 2 km. Closest: '+(d[0]&&d[0].title),items:d.slice(0,8).map(function(x){return {t:Math.round(x.dist)+' m',x:x.title}})}};
-R['commons']=function(t){var d=J(t).query.geosearch;return {headline:d.length+' freely licensed photos nearby',items:d.slice(0,6).map(function(x){return {t:Math.round(x.dist)+' m',x:x.title.replace('File:','')}})}};
 R['planning']=function(t){var d=J(t);return d.count?{headline:d.count+' planning constraints here',items:d.entities.slice(0,5).map(function(x){return {t:x.dataset,x:x.name||x.reference||''}})}:{headline:'No conservation area at this exact point',flag:'An empty answer is normal when the point is not inside one.'}};
 R['police-nh']=function(t){var d=J(t);return {headline:'Neighbourhood '+d.neighbourhood+', '+d.force.replace(/-/g,' ')}};
 R['nyc311']=function(t){var d=J(t);return {headline:d.length+' latest New York 311 requests',items:d.slice(0,5).map(function(x){return {t:clock(x.created_date),x:x.complaint_type+' · '+(x.borough||'')}}),flag:'New York example, not near you.'}};
@@ -357,7 +355,6 @@ R['eonet']=function(t){var e=J(t).events||[];return {headline:e.length+' open na
 R['meteoalarm']=function(t){var e=atom(t);return {headline:e.length+' UK warning entries in the feed',items:e.slice(0,6).map(function(x){return {t:clock(x.date),x:trunc(x.title,100)}}),flag:'No CORS header expected, so a browser may block it.'}};
 R['swpc-oval']=function(t){var d=J(t);return {headline:'Aurora forecast grid, '+(d.coordinates||[]).length+' points',rows:[['Observation time',d['Observation Time']],['Forecast time',d['Forecast Time']]],flag:'Large file; needs processing to be useful.'}};
 R['iss']=function(t){var d=J(t);return {headline:'ISS over '+r1(d.latitude,1)+', '+r1(d.longitude,1),rows:[['Altitude',r1(d.altitude,0)+' km'],['Speed',r1(d.velocity,0)+' km/h'],['Visibility',d.visibility],['Updated',ago(d.timestamp)]]}};
-R['inat']=function(t){var d=J(t);return {headline:d.total_results+' wildlife sightings within 3 km. Newest '+(d.results[0]?d.results[0].observed_on:''),items:d.results.slice(0,8).map(function(o){var tx=o.taxon||{};return {t:o.observed_on,x:(tx.preferred_common_name||tx.name||o.species_guess||'Unidentified')+' · '+trunc(o.place_guess||'',50)}}),itemsTitle:'Latest first'}};
 R['gbif']=function(t){var d=J(t);return {headline:d.count+' archived species records nearby',items:d.results.slice(0,6).map(function(o){return {t:(o.eventDate||'').slice(0,10),x:o.species||o.scientificName}})}};
 R['nager']=function(t){var d=J(t);return {headline:'Next: '+d[0].localName+', '+d[0].date,items:d.slice(0,4).map(function(x){return {t:x.date,x:x.localName}})}};
 R['ukair-sos']=function(t){var d=J(t);return {headline:'Returned '+d.length+' stations from the national list',items:d.slice(0,5).map(function(x){return {t:'',x:x.properties.label}}),flag:'No distance filter in this call; you would filter by location yourself.'}};
@@ -446,7 +443,8 @@ RUN['ea-levels']=function(c,get,first){var d=J(first.text),near=nearestStations(
     return Promise.all(cand.map(function(x){return get('https://environment.data.gov.uk/flood-monitoring/id/stations/'+x.s.ref+'/stageScale').then(function(r){x.sc=J(r.text).items},function(){})})).then(function(){
       var top=cand.filter(function(x){return x.sc&&x.sc.typicalRangeHigh!=null})[0]||cand[0]||res[0],lv=top&&levelOf(top.items),fl=top&&flowOf(top.items),t0=top.items[0]&&top.items[0].dateTime;
       var pos=top.sc&&lv!=null?levelPos(lv,top.sc):null;
-      return {headline:top.s.label+' on the '+(top.s.river||'river')+': '+(lv!=null?lv+' m':'no level reading')+(pos?' · '+pos.label.toLowerCase():''),level:pos||undefined,
+      var lm=top.items.filter(function(r){return /level-stage/.test(r.measure||'')&&!/downstage/.test(r.measure||'')})[0];
+      return {_m:lm&&lm.measure,_sc:top.sc,headline:top.s.label+' on the '+(top.s.river||'river')+': '+(lv!=null?lv+' m':'no level reading')+(pos?' · '+pos.label.toLowerCase():''),level:pos||undefined,
         rows:[['Water level',lv!=null?lv+' m (above the gauge datum)':'n/a',pos?pos.text:undefined],fl!=null?['Flow',fl+' m³/s']:null,['Reading time',t0?clock(t0)+' ('+ago(t0)+')':'n/a'],['Gauges within 10 km',(d.items||[]).length]].filter(Boolean),
         items:res.map(function(x){var l=levelOf(x.items);return {t:x.s.km.toFixed(1)+' km',x:x.s.label+': '+(l!=null?l+' m':'no level')+(flowOf(x.items)!=null?' · flow '+flowOf(x.items)+' m³/s':'')}}),itemsTitle:'Nearest gauges',
         flag:'Readings are every 15 minutes, but some sites upload only a few times a day.'}})})};
@@ -454,7 +452,7 @@ function rainWords(mm15){var h=mm15*4;return h===0?['Dry','No rain at this gauge
 RUN['ea-rain']=function(c,get,first){var d=J(first.text),near=nearestStations(d,c,3);
   return Promise.all(near.map(function(s){return readingsFor(s,get)})).then(function(res){
     var vals=res.map(function(x){return x.items[0]?x.items[0].value:null}),have=vals.filter(function(v){return v!=null}),mx=have.length?Math.max.apply(null,have):null,w=mx==null?null:rainWords(mx),r0=res[0].items[0];
-    return {headline:w?w[0]+' at the nearest gauges':'No reading at the nearest gauges',level:w?{k:w[2],label:w[0],text:w[1]+' Highest of '+have.length+' gauges: '+mx+' mm in the last 15 minutes.'}:undefined,
+    return {_m:r0&&r0.measure,headline:w?w[0]+' at the nearest gauges':'No reading at the nearest gauges',level:w?{k:w[2],label:w[0],text:w[1]+' Highest of '+have.length+' gauges: '+mx+' mm in the last 15 minutes.'}:undefined,
       rows:[['Reading time',r0?clock(r0.dateTime)+' ('+ago(r0.dateTime)+')':'n/a'],['Gauges within 15 km',(d.items||[]).length]],
       items:res.map(function(x){var q=x.items[0];return {t:x.s.km.toFixed(1)+' km',x:q?q.value+' mm in 15 min':'no reading'}}),itemsTitle:'Nearest gauges',flag:'Gauge names are all just “Rainfall station”; positions are snapped to a grid.'}})};
 
@@ -462,9 +460,9 @@ RUN['ea-rain']=function(c,get,first){var d=J(first.text),near=nearestStations(d,
 var CI_LVL={'very low':'good',low:'good',moderate:'ok',high:'warn','very high':'bad'};
 var CI_TEXT={'very low':'Very clean: mostly wind, solar and nuclear.',low:'Clean: low-carbon sources are doing most of the work.',moderate:'Middling: a fair share of gas on the grid.',high:'Dirty: gas and imports are doing a lot of the work.','very high':'Very dirty: avoid heavy use if you can.'};
 function ciBase(x,region){var i=x.intensity,v=i.actual!=null?i.actual:i.forecast;
-  return {_v:v,headline:v+' gCO₂/kWh, '+i.index+(region?' ('+region+')':''),level:{k:CI_LVL[i.index]||'info',label:i.index.charAt(0).toUpperCase()+i.index.slice(1),text:CI_TEXT[i.index]||''},rows:[['Half hour',clock(x.from)+' to '+clock(x.to).split(', ').pop()]],
+  return {_v:v,_mix:(x.generationmix||[]).filter(function(g){return g.perc>0}).sort(function(a,b){return b.perc-a.perc}).slice(0,6),headline:v+' gCO₂/kWh, '+i.index+(region?' ('+region+')':''),level:{k:CI_LVL[i.index]||'info',label:i.index.charAt(0).toUpperCase()+i.index.slice(1),text:CI_TEXT[i.index]||''},rows:[['Half hour',clock(x.from)+' to '+clock(x.to).split(', ').pop()]],
     items:(x.generationmix||[]).filter(function(g){return g.perc>0}).sort(function(a,b){return b.perc-a.perc}).slice(0,5).map(function(g){return {t:g.perc+'%',x:g.fuel}}),itemsTitle:'Where the power comes from'}}
-function ciAhead(pv,arr){if(!arr.length)return pv;var mn=arr[0],mx=arr[0],sum=0;arr.forEach(function(a){if(a.v<mn.v)mn=a;if(a.v>mx.v)mx=a;sum+=a.v});var avg=sum/arr.length;
+function ciAhead(pv,arr){if(!arr.length)return pv;pv._ci=arr;var mn=arr[0],mx=arr[0],sum=0;arr.forEach(function(a){if(a.v<mn.v)mn=a;if(a.v>mx.v)mx=a;sum+=a.v});var avg=sum/arr.length;
   function wd(t){return new Date(t).toLocaleString([],{weekday:'short',hour:'2-digit',minute:'2-digit'})}
   pv.rows.push(['Cleanest time ahead',mn.v+' gCO₂/kWh at '+wd(mn.t),'A good time to run the washing machine or charge a car.','good']);
   pv.rows.push(['Dirtiest time ahead',mx.v+' gCO₂/kWh at '+wd(mx.t),'Best to avoid heavy use then.','warn']);
@@ -504,6 +502,104 @@ R['fsa']=function(t){var d=J(t),e=d.establishments||[],n=function(s){return Stri
 R['police']=function(t){var d=J(t),by={};d.forEach(function(c){by[c.category]=(by[c.category]||0)+1});var m=d[0]&&d[0].month,keys=Object.keys(by).sort(function(a,b){return by[b]-by[a]}),days=30;
   return {headline:d.length+' crimes reported within a mile in '+m,level:{k:'info',label:'About '+r1(d.length/days,1)+' a day',text:'The most common type was '+(keys[0]||'none').replace(/-/g,' ')+' ('+(by[keys[0]]||0)+'). This is a count, not a rate, so compare it with another area before reading anything into it.'},rows:[['Month covered',m],['Freshness','About 2 months behind']],items:keys.slice(0,6).map(function(k){return {t:by[k],x:k.replace(/-/g,' ')}}),itemsTitle:'By category',flag:'Monthly data with locations deliberately blurred. Not live.'}};
 
+
+/* ---------- charts and pictures ---------- */
+/* A preview may carry viz:[...], cards:[...], images:[...]. Specs are plain data; these functions draw them as HTML/SVG. */
+var KCLASS={good:'good',ok:'ok',warn:'warn',bad:'bad',info:'info'};
+function nf(x,d){if(x==null||isNaN(x))return '';var a=Math.abs(x);return String(+(+x).toFixed(d!=null?d:(a>=100?0:a>=10?1:2)))}
+function safeUrl(u){return typeof u==='string'&&/^https:\/\//.test(u)?u:''}
+function vBars(v){var mx=v.max||Math.max.apply(null,v.data.map(function(d){return d.value}).concat(v.ref?[v.ref.value]:[]))||1,h='<figure class="viz"><figcaption>'+esc(v.title)+'</figcaption><div class="bars">';
+  v.data.forEach(function(d){h+='<div class="br"><span class="bl">'+esc(d.label)+'</span><span class="bt"><i class="vk-'+(KCLASS[d.k]||'accent')+'" style="width:'+Math.max(1,Math.min(100,100*d.value/mx)).toFixed(1)+'%"></i>'+(v.ref?'<u style="left:'+Math.min(100,100*v.ref.value/mx).toFixed(1)+'%"></u>':'')+'</span><span class="bv">'+esc(d.text||nf(d.value))+'</span></div>'});
+  return h+'</div>'+(v.ref?'<p class="vnote"><u></u> '+esc(v.ref.label)+'</p>':'')+(v.note?'<p class="vnote">'+esc(v.note)+'</p>':'')+'</figure>'}
+function vCols(v){var W=320,H=112,pl=30,pr=6,pt=10,pb=20,d=v.data,n=d.length;if(!n)return '';var mx=Math.max.apply(null,d.map(function(x){return x.value}).concat([v.max||0,v.ref?v.ref.value:0]))||1,bw=(W-pl-pr)/n;
+  var s='<svg viewBox="0 0 '+W+' '+H+'" class="vz" role="img" aria-label="'+esc(v.title)+'"><line class="v-base" x1="'+pl+'" y1="'+(H-pb)+'" x2="'+(W-pr)+'" y2="'+(H-pb)+'"/><text class="v-ax" x="'+(pl-4)+'" y="'+(pt+3)+'" text-anchor="end">'+nf(mx)+'</text><text class="v-ax" x="'+(pl-4)+'" y="'+(H-pb+3)+'" text-anchor="end">0</text>';
+  d.forEach(function(x,i){var h=(H-pt-pb)*x.value/mx,xx=pl+i*bw+bw*0.14;s+='<rect class="vk-'+(KCLASS[x.k]||'accent')+'" x="'+xx.toFixed(1)+'" y="'+(H-pb-h).toFixed(1)+'" width="'+(bw*0.72).toFixed(1)+'" height="'+Math.max(h,x.value>0?1:0).toFixed(1)+'" rx="1.5"/>'});
+  if(v.ref){var y=H-pb-(H-pt-pb)*v.ref.value/mx;s+='<line class="v-ref" x1="'+pl+'" y1="'+y.toFixed(1)+'" x2="'+(W-pr)+'" y2="'+y.toFixed(1)+'"/><text class="v-ax" x="'+(W-pr)+'" y="'+(y-3).toFixed(1)+'" text-anchor="end">'+esc(v.ref.label)+'</text>'}
+  (v.ticks||[0,Math.floor((n-1)/2),n-1]).forEach(function(i){if(d[i])s+='<text class="v-ax" x="'+(pl+i*bw+bw/2).toFixed(1)+'" y="'+(H-5)+'" text-anchor="middle">'+esc(d[i].label)+'</text>'});
+  return '<figure class="viz"><figcaption>'+esc(v.title)+'</figcaption>'+s+'</svg>'+(v.note?'<p class="vnote">'+esc(v.note)+'</p>':'')+'</figure>'}
+function vLine(v){var W=320,H=132,pl=34,pr=8,pt=10,pb=22,p=v.pts,n=p.length;if(n<2)return '';
+  var ys=p.map(function(a){return a.y}),dlo=Math.min.apply(null,ys),dhi=Math.max.apply(null,ys),lo=dlo,hi=dhi;if(v.band){lo=Math.min(lo,v.band.lo);hi=Math.max(hi,v.band.hi)}
+  var pad=(hi-lo)*0.12||1;lo-=pad;hi+=pad;
+  function X(i){return pl+(W-pl-pr)*i/(n-1)}function Y(y){return pt+(H-pt-pb)*(1-(y-lo)/(hi-lo))}
+  var d=p.map(function(a,i){return (i?'L':'M')+X(i).toFixed(1)+' '+Y(a.y).toFixed(1)}).join(' ');
+  var s='<svg viewBox="0 0 '+W+' '+H+'" class="vz" role="img" aria-label="'+esc(v.title)+'">';
+  if(v.band)s+='<rect class="v-band" x="'+pl+'" y="'+Y(v.band.hi).toFixed(1)+'" width="'+(W-pl-pr)+'" height="'+(Y(v.band.lo)-Y(v.band.hi)).toFixed(1)+'"/><text class="v-ax" x="'+(W-pr-2)+'" y="'+(Y(v.band.hi)+10).toFixed(1)+'" text-anchor="end">'+esc(v.band.label||'')+'</text>';
+  s+='<line class="v-base" x1="'+pl+'" y1="'+(H-pb)+'" x2="'+(W-pr)+'" y2="'+(H-pb)+'"/><path class="v-area" d="'+d+' L'+X(n-1).toFixed(1)+' '+(H-pb)+' L'+X(0).toFixed(1)+' '+(H-pb)+' Z"/><path class="v-line" d="'+d+'"/>';
+  var yh=v.band?v.band.hi:dhi,yl=v.band?v.band.lo:dlo;s+='<text class="v-ax" x="'+(pl-4)+'" y="'+(Y(yh)+3).toFixed(1)+'" text-anchor="end">'+nf(yh)+'</text><text class="v-ax" x="'+(pl-4)+'" y="'+(Y(yl)+3).toFixed(1)+'" text-anchor="end">'+nf(yl)+'</text>';
+  if(p[0].k)p.forEach(function(a,i){if(i%2===0||n<20)s+='<circle class="vk-'+(KCLASS[a.k]||'accent')+'" cx="'+X(i).toFixed(1)+'" cy="'+Y(a.y).toFixed(1)+'" r="2.6"/>'});
+  if(v.now!=null){var xn=X(v.now);s+='<line class="v-now" x1="'+xn.toFixed(1)+'" y1="'+pt+'" x2="'+xn.toFixed(1)+'" y2="'+(H-pb)+'"/><text class="v-ax" x="'+(xn+3).toFixed(1)+'" y="'+(pt+8)+'">now</text>'}
+  (v.ticks||[]).forEach(function(t){s+='<text class="v-ax" x="'+X(t.i).toFixed(1)+'" y="'+(H-6)+'" text-anchor="'+(t.i===0?'start':t.i===n-1?'end':'middle')+'">'+esc(t.label)+'</text>'});
+  return '<figure class="viz"><figcaption>'+esc(v.title)+'</figcaption>'+s+'</svg>'+(v.note?'<p class="vnote">'+esc(v.note)+'</p>':'')+'</figure>'}
+function vScale(v){var tot=v.max-v.min,prev=v.min,bar='',lab='';
+  v.segs.forEach(function(g){var w=(Math.min(g.to,v.max)-prev)/tot*100;bar+='<i class="vk-'+(KCLASS[g.k]||'accent')+'" style="width:'+w.toFixed(2)+'%"></i>';lab+='<span style="width:'+w.toFixed(2)+'%">'+esc(g.label)+'</span>';prev=g.to});
+  var pos=Math.max(0,Math.min(1,(v.value-v.min)/tot))*100;
+  return '<figure class="viz"><figcaption>'+esc(v.title)+'</figcaption><div class="sc"><div class="sc-bar">'+bar+'<b style="left:'+pos.toFixed(1)+'%"></b></div><div class="sc-lab">'+lab+'</div></div>'+(v.note?'<p class="vnote">'+esc(v.note)+'</p>':'')+'</figure>'}
+function vRadar(v){var S=280,C=S/2,Rr=118,mx=v.maxKm,s='<svg viewBox="0 0 '+S+' '+S+'" class="vz radar" role="img" aria-label="'+esc(v.title)+'">';
+  v.rings.forEach(function(k){var r=Rr*k/mx;s+='<circle class="v-ring" cx="'+C+'" cy="'+C+'" r="'+r.toFixed(1)+'"/><text class="v-ax" x="'+(C+3)+'" y="'+(C-r+10).toFixed(1)+'">'+k+' km</text>'});
+  s+='<line class="v-ring" x1="'+C+'" y1="12" x2="'+C+'" y2="'+(S-12)+'"/><line class="v-ring" x1="12" y1="'+C+'" x2="'+(S-12)+'" y2="'+C+'"/><text class="v-ax" x="'+(C+4)+'" y="12">N</text>';
+  var placed=[];v.pts.forEach(function(p,i){var x=C+Rr*p.dx/mx,y=C-Rr*p.dy/mx;s+='<circle class="vk-'+(KCLASS[p.k]||'accent')+'" cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="4"/>';var clash=placed.some(function(q){return Math.abs(q[0]-x)<46&&Math.abs(q[1]-y)<11});if(i<v.labelN&&p.label&&!clash&&x<S-50){placed.push([x,y]);s+='<text class="v-ax v-lbl" x="'+(x+6).toFixed(1)+'" y="'+(y+3).toFixed(1)+'">'+esc(p.label)+'</text>'}});
+  s+='<path class="v-you" d="M'+(C-5)+' '+C+'h10M'+C+' '+(C-5)+'v10"/>';
+  return '<figure class="viz"><figcaption>'+esc(v.title)+'</figcaption>'+s+'</svg>'+(v.note?'<p class="vnote">'+esc(v.note)+'</p>':'')+'</figure>'}
+function vDay(v){var W=320,H=64,pl=8,pr=8,w=W-pl-pr;function X(h){return pl+w*h/24}
+  var s='<svg viewBox="0 0 '+W+' '+H+'" class="vz" role="img" aria-label="'+esc(v.title)+'"><rect class="v-night" x="'+pl+'" y="16" width="'+w+'" height="18" rx="4"/><rect class="vk-warn" x="'+X(v.rise).toFixed(1)+'" y="16" width="'+(X(v.set)-X(v.rise)).toFixed(1)+'" height="18" rx="4" style="opacity:.75"/>';
+  [0,6,12,18,24].forEach(function(h){s+='<text class="v-ax" x="'+X(h).toFixed(1)+'" y="'+(H-4)+'" text-anchor="'+(h===0?'start':h===24?'end':'middle')+'">'+(h<10?'0':'')+h+':00</text>'});
+  s+='<text class="v-ax" x="'+X(v.rise).toFixed(1)+'" y="12" text-anchor="middle">'+esc(v.riseLabel)+'</text><text class="v-ax" x="'+X(v.set).toFixed(1)+'" y="12" text-anchor="middle">'+esc(v.setLabel)+'</text>';
+  if(v.now!=null)s+='<line class="v-now" x1="'+X(v.now).toFixed(1)+'" y1="14" x2="'+X(v.now).toFixed(1)+'" y2="38"/>';
+  return '<figure class="viz"><figcaption>'+esc(v.title)+'</figcaption>'+s+'</svg></figure>'}
+function vizHTML(v){try{return ({bars:vBars,columns:vCols,line:vLine,scale:vScale,radar:vRadar,daybar:vDay})[v.type](v)||''}catch(e){return ''}}
+function cardsHTML(cs){return '<ul class="arts">'+cs.map(function(c){var im=safeUrl(c.img);return '<li>'+(im?'<img loading="lazy" referrerpolicy="no-referrer" alt="" src="'+esc(im)+'">':'')+'<div><b>'+esc(c.title)+'</b>'+(c.sub?'<small>'+esc(c.sub)+'</small>':'')+(c.text?'<p>'+esc(c.text)+'</p>':'')+(safeUrl(c.href)?'<a href="'+esc(c.href)+'" target="_blank" rel="noopener">Read more ↗</a>':'')+'</div></li>'}).join('')+'</ul>'}
+function galleryHTML(im){return '<div class="gal">'+im.map(function(i){var s=safeUrl(i.src);if(!s)return '';var f='<figure><img loading="lazy" referrerpolicy="no-referrer" alt="'+esc(i.cap)+'" src="'+esc(s)+'"><figcaption>'+esc(i.cap)+(i.credit?'<small>'+esc(i.credit)+'</small>':'')+'</figcaption></figure>';return safeUrl(i.href)?'<a href="'+esc(i.href)+'" target="_blank" rel="noopener">'+f+'</a>':f}).join('')+'</div>'}
+
+/* ---------- new and upgraded renderers ---------- */
+function wrapR(id,fn){var o=R[id];R[id]=function(t,c){var pv=o(t,c);try{fn(pv,t,c)}catch(e){}return pv}}
+function wrapRUN(id,fn){var o=RUN[id];RUN[id]=function(c,get,first){return o(c,get,first).then(function(pv){return Promise.resolve().then(function(){return fn(pv,c,get)}).then(function(){return pv},function(){return pv})})}}
+function hhmm(x){return new Date(x).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false})}
+function distTxt(km){return km<1?Math.round(km*1000)+' m':r1(km,1)+' km'}
+R['wiki-geo']=function(t,c){var ps=((J(t).query||{}).pages)||[],cards=ps.map(function(p){var co=p.coordinates&&p.coordinates[0],km=co?hav(lat0(c),lon0(c),co.lat,co.lon):99;return {km:km,title:p.title,sub:distTxt(km)+' away',text:trunc(strip(p.extract||''),460),img:p.thumbnail&&p.thumbnail.source,href:'https://en.wikipedia.org/?curid='+p.pageid}}).sort(function(a,b){return a.km-b.km});
+  return {headline:cards.length+' Wikipedia articles within 2 km. Closest: '+(cards[0]?cards[0].title:'none'),cards:cards.slice(0,6),flag:'Text from Wikipedia, licensed CC BY-SA 4.0. Each article links to its page and authors.'}};
+R['commons']=function(t,c){var ps=((J(t).query||{}).pages)||[],im=ps.filter(function(p){return p.imageinfo&&p.imageinfo[0]&&p.imageinfo[0].thumburl}).sort(function(a,b){return (a.index||0)-(b.index||0)}).slice(0,8).map(function(p){var ii=p.imageinfo[0],em=ii.extmetadata||{};
+  return {src:ii.thumburl,href:ii.descriptionurl,cap:p.title.replace(/^File:/,'').replace(/\.[A-Za-z0-9]+$/,'').replace(/_/g,' '),credit:[strip((em.Artist||{}).value),(em.LicenseShortName||{}).value].filter(Boolean).join(' · ')}});
+  return {headline:im.length+' freely licensed photos taken nearby',images:im,flag:'Each photo has its own licence and author, shown under it. Check before reusing.'}};
+R['inat']=function(t){var d=J(t),im=d.results.filter(function(o){return o.photos&&o.photos[0]}).slice(0,6).map(function(o){var tx=o.taxon||{},ph=o.photos[0];return {src:(ph.url||'').replace('square','medium'),href:o.uri,cap:(tx.preferred_common_name||tx.name||'Unidentified')+' · '+(o.observed_on||''),credit:strip(ph.attribution||'')}});
+  return {headline:d.total_results+' wildlife sightings within 3 km. Newest '+(d.results[0]?d.results[0].observed_on:''),images:im,items:d.results.slice(0,6).map(function(o){var tx=o.taxon||{};return {t:o.observed_on,x:(tx.preferred_common_name||tx.name||o.species_guess||'Unidentified')+' · '+trunc(o.place_guess||'',50)}}),itemsTitle:'Latest first'}};
+
+wrapR('om-forecast',function(pv,t){var d=J(t),h=d.hourly;if(h&&h.time){var now=Date.now(),i0=0;while(i0<h.time.length&&new Date(h.time[i0]).getTime()<now-36e5)i0++;var T=h.time.slice(i0,i0+25),Y=h.temperature_2m.slice(i0,i0+25);
+    if(T.length>3){var hr=function(s){return s.slice(11,16)};pv.viz=[{type:'line',title:'Temperature, next 24 hours (°C)',pts:T.map(function(x,i){return {y:Y[i]}}),now:0,ticks:[0,6,12,18,24].filter(function(i){return i<T.length}).map(function(i){return {i:i,label:hr(T[i])}})}]}}
+  var m=d.minutely_15;if(m&&m.time.length){var cols={type:'columns',title:'Rain, next two hours (mm per 15 minutes)',data:m.time.slice(0,8).map(function(x,i){return {label:x.slice(11),value:m.precipitation[i],k:m.precipitation[i]>0.5?'warn':'ok'}}),max:1,ticks:[0,3,7]};(pv.viz=pv.viz||[]).push(cols);pv.items=[]}});
+wrapR('om-aq',function(pv,t){var c=J(t).current,v=[];
+  v.push({type:'scale',title:'European air quality index',min:0,max:120,value:c.european_aqi,segs:[{to:20,label:'Good',k:'good'},{to:40,label:'Fair',k:'ok'},{to:60,label:'Mod',k:'warn'},{to:80,label:'Poor',k:'bad'},{to:100,label:'V poor',k:'bad'},{to:120,label:'Extr',k:'bad'}]});
+  if(c.uv_index!=null)v.push({type:'scale',title:'UV index',min:0,max:12,value:c.uv_index,segs:[{to:3,label:'Low',k:'good'},{to:6,label:'Moderate',k:'ok'},{to:8,label:'High',k:'warn'},{to:11,label:'Very high',k:'bad'},{to:12,label:'',k:'bad'}]});
+  pv.viz=v});
+wrapR('sensorcomm',function(pv,t,c){var d=J(t),by={};d.forEach(function(r){var id=r.sensor.id,o=by[id]||(by[id]={lat:+r.location.latitude,lon:+r.location.longitude,v:{}});r.sensordatavalues.forEach(function(x){o.v[x.value_type]=parseFloat(x.value)})});
+  var data=Object.keys(by).map(function(k){var o=by[k];o.km=hav(lat0(c),lon0(c),o.lat,o.lon);return o}).filter(function(o){return o.v.P2!=null&&o.v.P2>=0&&o.v.P2<1000}).sort(function(a,b){return a.km-b.km}).slice(0,8).map(function(o){return {label:o.km.toFixed(1)+' km',value:o.v.P2,text:o.v.P2+' µg/m³',k:lk(bandOf('pm2_5',o.v.P2))}});
+  if(data.length)pv.viz=[{type:'bars',title:'PM2.5 at each sensor',data:data,max:Math.max(20,Math.max.apply(null,data.map(function(x){return x.value}))),ref:{value:WHO.pm2_5,label:'WHO daily guideline, 15 µg/m³'}}]});
+function augCI(pv){var a=pv._ci;if(!a||a.length<4)return;var now=Date.now(),i0=0;while(i0<a.length-1&&new Date(a[i0].t).getTime()+18e5<now)i0++;var s=a.slice(i0);
+  var hh=hhmm;
+  var viz=[{type:'line',title:'Forecast, next 24 hours (gCO₂/kWh)',pts:s.map(function(x){return {y:x.v,k:CI_LVL[x.i]||'info'}}),now:0,ticks:[0,16,32,s.length-1].filter(function(i,j,arr){return i<s.length&&arr.indexOf(i)===j}).map(function(i){return {i:i,label:hh(s[i].t)}}),note:'Dot colour shows the grid’s own rating: green low, teal moderate, amber high, red very high.'}];
+  if(pv._mix&&pv._mix.length)viz.push({type:'bars',title:'Where the power comes from now (%)',data:pv._mix.map(function(g){return {label:g.fuel,value:g.perc,text:g.perc+'%',k:/wind|solar|nuclear|hydro|biomass/i.test(g.fuel)?'good':/gas|coal|oil/i.test(g.fuel)?'warn':'info'}}),max:100});
+  pv.viz=viz;pv.items=[]}
+wrapRUN('ci-nat',augCI);wrapRUN('ci-reg',augCI);
+wrapR('ci-gen',function(pv){var it=pv.items.slice();pv.viz=[{type:'bars',title:'Share of GB generation now (%)',data:it.map(function(i){var f=i.x;return {label:f,value:parseFloat(i.t),text:i.t,k:/wind|solar|nuclear|hydro|biomass/i.test(f)?'good':/gas|coal|oil/i.test(f)?'warn':'info'}}),max:50}];pv.items=[]});
+wrapR('elexon',function(pv){var it=pv.items.slice();pv.viz=[{type:'bars',title:'Generation by fuel (GW)',data:it.map(function(i){return {label:i.x,value:parseFloat(i.t),text:i.t,k:/WIND|SOLAR|NUCLEAR|NPSHYD|BIOMASS/.test(i.x)?'good':/CCGT|OCGT|COAL|OIL/.test(i.x)?'warn':'info'}}),max:Math.max.apply(null,it.map(function(i){return parseFloat(i.t)}))}];pv.items=[]});
+wrapR('police',function(pv){var it=pv.items.slice();pv.viz=[{type:'bars',title:'Crimes by type',data:it.map(function(i){return {label:i.x,value:+i.t,text:String(i.t)}}),max:Math.max.apply(null,it.map(function(i){return +i.t}))}];pv.items=[]});
+wrapR('fsa',function(pv,t){var by={};((J(t).establishments)||[]).forEach(function(x){if(/^\d$/.test(x.RatingValue))by[x.RatingValue]=(by[x.RatingValue]||0)+1});var ks=Object.keys(by).sort(function(a,b){return b-a});
+  if(ks.length)pv.viz=[{type:'bars',title:'Hygiene ratings nearby (5 is best)',data:ks.map(function(k){return {label:'Rated '+k,value:by[k],text:String(by[k]),k:k>=4?'good':k==3?'ok':'bad'}}),max:Math.max.apply(null,ks.map(function(k){return by[k]}))}]});
+wrapR('swpc-kp',function(pv,t){var d=J(t).filter(function(r){return Array.isArray(r)?r[0]!=='time_tag':true}).map(function(r){return Array.isArray(r)?{time:r[0],kp:+r[1]}:{time:r.time_tag,kp:+(r.Kp!=null?r.Kp:r.kp_index)}}).slice(-16),l=d[d.length-1];
+  pv.viz=[{type:'scale',title:'Kp index now',min:0,max:9,value:l.kp,segs:[{to:4,label:'Quiet',k:'info'},{to:5,label:'Active',k:'ok'},{to:7,label:'Storm',k:'warn'},{to:9,label:'Severe',k:'bad'}]},
+    {type:'columns',title:'Kp index, last two days',data:d.map(function(r){return {label:String(r.time).slice(5,10)+' '+String(r.time).slice(11,13)+'h',value:r.kp,k:r.kp>=7?'bad':r.kp>=5?'warn':r.kp>=4?'ok':'info'}}),max:9,ref:{value:5,label:'storm'},ticks:[0,7,15]}];pv.items=[]});
+wrapR('sunapi',function(pv,t,c){var r=J(t).results,a=new Date(r.sunrise),b=new Date(r.sunset),n=new Date();function H(d){return d.getHours()+d.getMinutes()/60}
+  pv.viz=[{type:'daybar',title:'Daylight today',rise:H(a),set:H(b),now:H(n),riseLabel:a.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'}),setLabel:b.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}]});
+function radarFrom(pts,c,label){var P=pts.map(function(p){var dx=(p.lon-lon0(c))*Math.cos(lat0(c)*Math.PI/180)*111.32,dy=(p.lat-lat0(c))*110.57;return {dx:dx,dy:dy,km:Math.sqrt(dx*dx+dy*dy),label:p.label,k:p.alt==null?'info':p.alt<1500?'warn':p.alt<5000?'ok':'info'}}).sort(function(a,b){return a.km-b.km});
+  if(!P.length)return null;P=P.slice(0,12);var far=P[P.length-1].km,mx=far<=10?10:far<=20?20:far<=40?40:far<=80?80:far<=160?160:320;
+  return {type:'radar',title:'Aircraft around you ('+label+')',pts:P,maxKm:mx,rings:[mx/4,mx/2,mx].map(function(x){return +x.toFixed(0)}),labelN:6,note:'Nearest 12 aircraft. Orange: under 1,500 m. Teal: 1,500 to 5,000 m. Grey: higher. North is up.'}}
+wrapR('opensky',function(pv,t,c){var s=(J(t).states||[]).filter(function(x){return !x[8]&&x[5]!=null&&x[6]!=null});var v=radarFrom(s.map(function(x){return {lat:x[6],lon:x[5],alt:x[13]!=null?x[13]:x[7],label:(x[1]||'').trim()}}),c,'OpenSky');if(v){pv.viz=[v];pv.items=[]}});
+wrapR('adsblol',function(pv,t,c){var s=(J(t).ac||[]).filter(function(x){return x.alt_baro!=='ground'&&x.lat!=null});var v=radarFrom(s.map(function(x){return {lat:x.lat,lon:x.lon,alt:typeof x.alt_baro==='number'?x.alt_baro*0.3048:null,label:(x.flight||x.r||'').trim()}}),c,'adsb.lol');if(v){pv.viz=[v];pv.items=[]}});
+wrapRUN('ea-levels',function(pv,c,get){if(!pv._m)return;return get(String(pv._m).replace(/^http:/,'https:')+'/readings?_sorted&_limit=96').then(function(r){var it=(J(r.text).items||[]).slice().reverse().filter(function(x){return typeof x.value==='number'});if(it.length<4)return;
+  var sc=pv._sc||{},hh=hhmm,n=it.length;
+  pv.viz=[{type:'line',title:'Water level, last '+Math.round(n/4)+' hours (m)',pts:it.map(function(x){return {y:x.value}}),band:sc.typicalRangeLow!=null?{lo:sc.typicalRangeLow,hi:sc.typicalRangeHigh,label:'Usual range'}:undefined,ticks:[0,Math.floor((n-1)/2),n-1].map(function(i){return {i:i,label:hh(it[i].dateTime)}})}]})});
+wrapRUN('ea-rain',function(pv,c,get){if(!pv._m)return;return get(String(pv._m).replace(/^http:/,'https:')+'/readings?_sorted&_limit=24').then(function(r){var it=(J(r.text).items||[]).slice().reverse().filter(function(x){return typeof x.value==='number'});if(it.length<3)return;
+  var hh=hhmm,tot=it.reduce(function(s,x){return s+x.value},0);
+  pv.viz=[{type:'columns',title:'Rain at the nearest gauge, last '+Math.round(it.length/4)+' hours (mm per 15 minutes)',data:it.map(function(x){return {label:hh(x.dateTime),value:x.value,k:x.value*4>=2.5?'warn':'ok'}}),max:1,ticks:[0,Math.floor((it.length-1)/2),it.length-1],note:r1(tot,1)+' mm in total over this period.'}]})});
 
 /* Per-source overrides: request headers, heavy files skipped by "Load all", and what an earlier server-side probe predicted. */
 var EXTRA={
@@ -563,7 +659,10 @@ function pump(){while(active<MAX&&queue.length){var id=queue.shift();active++;lo
 /* ---------- drawing ---------- */
 function pvHTML(pv){var h='<p class="head">'+esc(pv.headline||'')+'</p>';
   if(pv.level)h+='<p class="lvl lvl-'+esc(pv.level.k)+'"><b>'+esc(pv.level.label)+'</b> '+esc(pv.level.text)+'</p>';
+  if(pv.viz)pv.viz.forEach(function(v){h+=vizHTML(v)});
   if(pv.rows&&pv.rows.length)h+='<dl class="kv">'+pv.rows.map(function(r){return '<dt>'+esc(r[0])+'</dt><dd>'+esc(r[1])+(r[2]?'<small class="note'+(r[3]?' n-'+esc(r[3]):'')+'">'+esc(r[2])+'</small>':'')+'</dd>'}).join('')+'</dl>';
+  if(pv.cards&&pv.cards.length)h+=cardsHTML(pv.cards);
+  if(pv.images&&pv.images.length)h+=galleryHTML(pv.images);
   if(pv.items&&pv.items.length)h+=(pv.itemsTitle?'<p class="it">'+esc(pv.itemsTitle)+'</p>':'')+'<ul class="items">'+pv.items.map(function(i){return '<li>'+(i.t!==''&&i.t!=null?'<b>'+esc(i.t)+'</b>':'')+'<span>'+esc(i.x)+'</span></li>'}).join('')+'</ul>';
   if(pv.flag)h+='<p class="flag">'+esc(pv.flag)+'</p>';return h}
 function card(s){var url=urlFor(s);
@@ -621,4 +720,4 @@ $('#presets').innerHTML=PRESETS.map(function(p){return '<button class="chip" dat
 $('#nt').innerHTML=NOT_TESTABLE.map(function(s){return '<li><b>'+esc(s.name)+'</b> <span>'+esc(s.scope)+' · '+esc({key:'needs a key',oauth:'needs a login',paid:'paid or limited',closed:'closed',unknown:'no known endpoint',open:'no direct call yet'}[s.auth]||'')+'</span><br>'+esc(s.note||s.desc)+'</li>'}).join('');
 syncFields();renderList();summary();
 })()}
-if(typeof module!=='undefined')module.exports={SRC:SRC,R:R,RUN:RUN,CATS:CATS,TESTABLE:SRC.filter(function(s){return s.u})};
+if(typeof module!=='undefined')module.exports={SRC:SRC,R:R,RUN:RUN,CATS:CATS,vizHTML:vizHTML,cardsHTML:cardsHTML,galleryHTML:galleryHTML,TESTABLE:SRC.filter(function(s){return s.u})};
